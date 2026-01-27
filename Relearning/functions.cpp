@@ -1,7 +1,9 @@
 #include <iostream>
 #include "functions.h"
 
+using namespace std;
+
 void function()
 {
-    std::cout << "Here is a function!" << std::endl;
+    cout << "Here is a function!" << endl;
 }

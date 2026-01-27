@@ -1,9 +1,6 @@
-#pragma once
-#include <iostream>
+#ifndef FUNC_H
+#define FUNC_H
 
-class functions
-{
-    public:
-    void function();
-};
+void function();
 
+#endif
