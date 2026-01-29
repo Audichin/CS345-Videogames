@@ -5,5 +5,5 @@ using namespace std;
 
 void function()
 {
-    cout << "Here is a function!" << endl;
+    cout << "Hello from SRC folder!" << endl;
 }

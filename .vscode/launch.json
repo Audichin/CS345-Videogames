@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/imooney/CS345-Videogames/Relearning",
-      "program": "/home/imooney/CS345-Videogames/Relearning/build/Debug/outDebug",
+      "cwd": "/home/imooney/CS345-Videogames/LibFunction/src",
+      "program": "/home/imooney/CS345-Videogames/LibFunction/src/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
