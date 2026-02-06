@@ -1,14 +1,10 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -I$(HOME)/vcpkg/installed/x64-linux/include
-LDFLAGS = -L$(HOME)/vcpkg/installed/x64-linux/lib -lcurl
+LIBS = -std=c++17 -I$(HOME)/vcpkg/installed/x64-linux/include/**
+FLAGS = -L$(HOME)/vcpkg/installed/x64-linux/include/** -lcurl
+PROJ = phyphox
 
-SRC = main.cpp
-TARGET = phyphox
+phyphox.exe: phyphox.cpp
+	g++ $(FLAGS) $< -o $@ $(LIBS)
 
-all: $(TARGET)
-
-$(TARGET): $(SRC)
-    $(CXX) $(CXXFLAGS) $(SRC) -o $(TARGET) $(LDFLAGS)
-
-clean:
-    rm -f $(TARGET)
+run: $(PROJ)
+	./$<
