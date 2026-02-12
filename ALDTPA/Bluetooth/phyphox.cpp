@@ -6,12 +6,12 @@
 size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
     ((std::string*)userp)->append((char*)contents, size * nmemb);
     return size * nmemb;
-}
+} 
 
-int main() {
+int main() {  
     // Replace this with your phone's IP + experiment endpoint
     std::string url = "http://192.168.1.64";
-
+  
     CURL* curl;
     CURLcode res;
     std::string readBuffer;

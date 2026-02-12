@@ -1,4 +1,4 @@
-#include <./SDL.h>
+#include <SDL.h>
 #include <iostream>
 
 using namespace std;
@@ -9,11 +9,23 @@ int error(string s){
 }
 
 int init(SDL_Window* &window,SDL_Renderer* &renderer,int width,int height){
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) return error("SDL could not initialize! SDL_Error: "); 
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) 
+    {
+        return error("SDL could not initialize! SDL_Error: "); 
+    }
+
     window = SDL_CreateWindow("Simple SDL2 Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
-    if (window == NULL) return error("Window could not be created! SDL_Error:");
+    if (window == NULL) 
+    {
+        return error("Window could not be created! SDL_Error:");
+    }
+    
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (renderer == NULL) return error("Renderer could not be created! SDL_Error:");
+    if (renderer == NULL) 
+    {
+        return error("Renderer could not be created! SDL_Error:");
+    }
+
     return 0;
 }
 
@@ -29,8 +41,11 @@ int main(int argc, char* args[]) {
     SDL_Window* window = NULL;
     SDL_Renderer* renderer = NULL;
     int retval=init(window,renderer,640,480);
-    if (retval!=0) return retval;
-    
+    if (retval!=0) 
+    {
+        return retval;
+    }
+
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Gray color
     
     bool quit = false;
