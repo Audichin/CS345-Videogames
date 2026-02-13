@@ -1,38 +1,19 @@
 {
-<<<<<<< HEAD
-  "configurations": [
-    {
-      "name": "windows-gcc-x64",
-      "includePath": [
-        "${workspaceFolder}/**"
-      ],
-      "compilerPath": "C:/mingw64/bin/gcc.exe",
-      "cStandard": "${default}",
-      "cppStandard": "${default}",
-      "intelliSenseMode": "windows-gcc-x64",
-      "compilerArgs": [
-        ""
-      ]
-    }
-  ],
-  "version": 4
-=======
     "configurations": [
         {
-            "name": "linux-gcc-x64",
+            "name": "windows-gcc-x64",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${HOME}/vcpkg/installed/x64-linux/include/**"
+                "C:/Users/glimp/vcpkg/installed/x64-windows/include"
             ],
-            "compilerPath": "/usr/bin/gcc",
+            "compilerPath": "C:/mingw64/bin/gcc.exe",
             "cStandard": "${default}",
             "cppStandard": "${default}",
-            "intelliSenseMode": "linux-gcc-x64",
+            "intelliSenseMode": "windows-gcc-x64",
             "compilerArgs": [
                 ""
             ]
         }
     ],
     "version": 4
->>>>>>> f68dc95ab79403fd6fa87cf572c793c17bc260ab
 }
