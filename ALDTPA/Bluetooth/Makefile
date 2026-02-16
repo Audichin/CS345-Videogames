@@ -2,12 +2,18 @@ CXX = clang++
 
 VCPKG_ROOT = C:/Users/glimp/vcpkg
 TRIPLET = x64-mingw-static
+TRIPLET_WIN = x64-windows
 
-INCLUDES = -I$(VCPKG_ROOT)/installed/$(TRIPLET)/include
-LIBDIR = -L$(VCPKG_ROOT)/installed/$(TRIPLET)/lib
+INCLUDES = -I$(VCPKG_ROOT)/installed/$(TRIPLET)/include \
+           -I$(VCPKG_ROOT)/installed/$(TRIPLET_WIN)/include
 
-LIBS = -lcurl -lzlib -lws2_32 -lcrypt32 -lwldap32 -lbcrypt -liphlpapi -lsecur32
-CXXFLAGS = -std=c++17
+LIBDIR = -L$(VCPKG_ROOT)/installed/$(TRIPLET)/lib \
+         -L$(VCPKG_ROOT)/installed/$(TRIPLET_WIN)/lib
+
+LIBS = -lcurl -lzlib \
+       -lws2_32 -lcrypt32 -lwldap32 -lbcrypt -liphlpapi -lsecur32
+
+CXXFLAGS = -std=c++17 -Wall
 
 PROJ = phyphox
 
