@@ -3,29 +3,32 @@
 #include <string>
 #include <iostream>
 
+#include "phyphox.h"
+
 using json = nlohmann::json;
 
-static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* output) {
-    size_t totalSize = size * nmemb;
-    output->append((char*)contents, totalSize);
-    return totalSize;
-}
-
 int main() {
-    CURL* curl;
-    CURLcode res;
-    std::string readBuffer;
-    
-    std::cout << "Testing!" << std::endl;
-    curl = curl_easy_init();
-    if(curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, "http://10.4.46.233/get?buffer=accX&buffer=accY&buffer=accZ&buffer=gyrX&buffer=gyrY&buffer=gyrZ");
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+    Phyphox px;
+    px.curl = curl_easy_init();
+    std::cout << "[NOTICE]: Make sure your phone and PC are using the same Wi-fi" << std::endl;
+    std::cout << "Paste Phyphox address numbers:";
+    std::cin >> px.URL_temp;
+    px.URL = "http://" + px.URL_temp + "/get?buffer=accX&buffer=accY&buffer=accZ&buffer=gyrX&buffer=gyrY&buffer=gyrZ";
 
-        res = curl_easy_perform(curl);
-        curl_easy_cleanup(curl);
+    if(px.curl) {
+        curl_easy_setopt(px.curl, CURLOPT_URL, px.URL.c_str());
+        curl_easy_setopt(px.curl, CURLOPT_WRITEFUNCTION, px.WriteCallback);
+        curl_easy_setopt(px.curl, CURLOPT_WRITEDATA, &px.readBuffer);
+
+        px.res = curl_easy_perform(px.curl);
+        curl_easy_cleanup(px.curl);
+    }
+    else
+    {
+        std::cout << "[ERR]: curl failed to initalize upon runtime" << std::endl;
     }
 
-    std::cout << readBuffer << std::endl;
+    std::cout << px.readBuffer << std::endl;
+
+    return 0;
 }
