@@ -5,7 +5,7 @@
 #include <thread>
 #include <chrono>
 
-#include <curl/curl.h>
+#include "curl/curl.h"
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -87,7 +87,7 @@ private:
     {
         json j = json::parse(response);
         try{
-            std::cout << j << std::endl;
+            std::cout << j << std::endl; 
         }
         catch(...){
             std::cout << "[WARN]: JSON could not parse most recent Phyphox data..." << std::endl;

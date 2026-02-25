@@ -1,4 +1,5 @@
-#include "./Phyphox.h"
+#include "phyphox.h"
+#include <nlohmann/json.hpp>
 #include <iostream>
 
 int main() {
@@ -13,4 +14,4 @@ int main() {
     poller.Phyphox_loop(50);
     
     return 0;
-} 
+}   

@@ -1,6 +1,6 @@
 PROJ = test
 INCLUDES = ${shell sdl2-config --cflags}
-LIBS = 
+LIBS = ${shell sdl2-config --libs}
 LIBRARIES = ${shell sdl2-config --libs}
 
 run: $(PROJ).exe

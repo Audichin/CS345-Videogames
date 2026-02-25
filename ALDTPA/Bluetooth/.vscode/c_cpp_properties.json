@@ -3,16 +3,21 @@
     {
       "name": "linux-gcc-x64",
       "includePath": [
-        "${workspaceFolder}/**"
+        "${workspaceFolder}/**",
+        "C:/Users/glimp/vcpkg/installed/x64-windows/include/SDL2",
+        "C:/Users/glimp/vcpkg/installed/x64-mingw-dynamic/include",
+        "C:/Users/glimp/vcpkg/installed/x64-windows/include",
+        "C:/Users/glimp/vcpkg/installed/x64-mingw-static/include"
       ],
       "compilerPath": "/usr/bin/gcc",
       "cStandard": "${default}",
       "cppStandard": "${default}",
       "intelliSenseMode": "linux-gcc-x64",
       "compilerArgs": [
-        ""
+        "-lSDL2 "
       ]
     }
   ],
   "version": 4
 }
+

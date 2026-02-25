@@ -5,23 +5,25 @@ TRIPLET_STAT = x64-mingw-static
 TRIPLET_WIN = x64-windows
 TRIPLET_DYNAM = x64-mingw-dynamic
 
-INCLUDES = -I$(VCPKG_ROOT)/installed/$(TRIPLET_win)/include \
+INCLUDES = -I$(VCPKG_ROOT)/installed/$(TRIPLET)/include \
            -I$(VCPKG_ROOT)/installed/$(TRIPLET_WIN)/include \
-		   -I$(VCPKG_ROOT)/installed/$(TRIPLET_DYNAM)/include
+		   -I$(VCPKG_ROOT)/installed/$(TRIPLET_DYNAM)/include \
+		   -IC:/Users/glimp/vcpkg/installed/x64-windows/include/SDL2
 
 LIBDIR = -L$(VCPKG_ROOT)/installed/$(TRIPLET)/lib \
          -L$(VCPKG_ROOT)/installed/$(TRIPLET_WIN)/lib \
-		 -L$(VCPKG_ROOT)/installed/$(TRIPLET_DYNAM)/lib
+		 -L$(VCPKG_ROOT)/installed/$(TRIPLET_DYNAM)/lib \
+		 -LC:/Users/glimp/vcpkg/installed/x64-windows/lib
 
 LIBS = -lcurl -lzlib \
-       -lws2_32 -lcrypt32 -lwldap32 -lbcrypt -liphlpapi -lsecur32 -pthread
+       -lws2_32 -lcrypt32 -lwldap32 -lbcrypt -liphlpapi -lsecur32 -pthread -lSDL2 
 
 CXXFLAGS = -std=c++17 -Wall
 
 PROJ = main
 
 $(PROJ).exe: $(PROJ).cpp
-	$(CXX) $(PROJ).cpp $(CXXFLAGS) $(INCLUDES) -o $@ $(LIBDIR) $(LIBS)
+	$(CXX) $(PROJ).cpp $(CXXFLAGS) $(INCLUDES) -o $@ $(LIBDIR) $(LIBS) -v
 
 run: $(PROJ).exe
 	./$(PROJ).exe
