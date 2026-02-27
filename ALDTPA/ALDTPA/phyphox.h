@@ -27,6 +27,7 @@ public:
 
     int Phyphox_loop(int wait)
     {
+       wait = 0;
         do
         {
             std::string recieve;
@@ -43,21 +44,21 @@ public:
             }
             else 
             {
+                if (wait == 5)
+                {
+                    std::cout << "[ERR]: Lost connection to phone, please check connection and reset phone graphs..." << std::endl;
+                    return -1; // temp for now, hope to reset makeURL to base state and allow game to continue after fixing connection
+                }
                 if (res != CURLE_OK) 
                 {
+                    std::cout << "[WARN 1]: Curl lost connection, waiting: " << 5 - wait << std::endl;
                     wait++;
-                    std::cout << "[WARN]: Curl lost connection, waiting: " << 5 - wait << std::endl;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 }
-            }
-            if (wait == 5)
-            {
-                std::cout << "[ERR]: Lost connection to phone, please check connection and reset phone graphs..." << std::endl;
-                return -1; // temp for now, hope to reset makeURL to base state and allow game to continue after fixing connection
             }
         std::this_thread::sleep_for(std::chrono::milliseconds(wait));
         }while(true);
     }
-
 
 private:
     CURL *curl;
@@ -65,7 +66,7 @@ private:
     float prevAcc;
     float prevGyro;
     int pause;
-    int wait;
+    int wait = 0;
 
     struct IMUData
     {
@@ -106,51 +107,60 @@ private:
         auto& buffer = j["buffer"];
         bool measuring;
         IMUData data;
-
         try
         {
             if (j.contains("status"))
             {
-            measuring = j["status"]["measuring"];
-            data.measuring = j["status"]["measuring"];
-            if (measuring == true)
-            {
-                if (buffer.contains("acc_time")) 
+                measuring = j["status"]["measuring"];
+                data.measuring = j["status"]["measuring"];
+                if (measuring == true)
                 {
-                    auto accTimes = buffer["acc_time"]["buffer"];
-                    auto accX = buffer["accX"]["buffer"];
-                    auto accY = buffer["accY"]["buffer"];
-                    auto accZ = buffer["accZ"]["buffer"];
+                    if (buffer.contains("acc_time")) 
+                    {
+                        auto accTimes = buffer["acc_time"]["buffer"];
+                        auto accX = buffer["accX"]["buffer"];
+                        auto accY = buffer["accY"]["buffer"];
+                        auto accZ = buffer["accZ"]["buffer"];
+                        std::cout << "MADE IT TO ACC" << std::endl;
+                        data.ax = static_cast<float>(accX.back());
+                        data.ay = static_cast<float>(accY.back());
+                        data.az = static_cast<float>(accZ.back());
+                    }
 
-                    data.ax = static_cast<float>(accX.back());
-                    data.ay = static_cast<float>(accY.back());
-                    data.az = static_cast<float>(accZ.back());
+                    if (buffer.contains("gyro_time")) 
+                    {
+                        auto gyroTimes = buffer["gyro_time"]["buffer"];
+                        auto gyroX = buffer["gyroX"]["buffer"];
+                        auto gyroY = buffer["gyroY"]["buffer"];
+                        auto gyroZ = buffer["gyroZ"]["buffer"];
+                        std::cout << "MADE IT TO GYRO" << std::endl;
+
+                        data.gx = static_cast<float>(gyroX.back());
+                        // data.gy = static_cast<float>(gyroY.back());
+                        // data.gz = static_cast<float>(gyroZ.back());
+                    }
                 }
-
-                if (buffer.contains("gyro_time")) 
+                else
                 {
-                    auto gyroTimes = buffer["gyro_time"]["buffer"];
-                    auto gyroX = buffer["gyroX"]["buffer"];
-                    auto gyroY = buffer["gyroY"]["buffer"];
-                    auto gyroZ = buffer["gyroZ"]["buffer"];
-
-                    data.gx = static_cast<float>(gyroX.back());
-                    data.gy = static_cast<float>(gyroY.back());
-                    data.gz = static_cast<float>(gyroZ.back());
-
+                    throw 2; 
                 }
             }
             else
             {
-               throw; 
+                throw 1;
             }
-            }
-
         }
-        catch(...)
+        catch(int err)
         {
-            std::cout << "[WARN]: JSON could not parse most recent Phyphox data..." << std::endl;
+            if (err == 1)
+            {
+                std::cout << "[WARN 2]: JSON could not parse most recent Phyphox data..." << std::endl;
+            }
+            if (err == 2)
+            {
+                std::cout << "[WARN 3]: Data not coming in, unpause Phyphox on phone..." << std::endl;   
+            }
         }
-        
+        return data;
     }
-};
+};  

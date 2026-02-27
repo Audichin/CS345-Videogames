@@ -6,8 +6,8 @@ using namespace std;
 int phy_main() 
 {
 std::string ip;
-std::cout << "[NOTICE]: Pleas make sure you are connected to the same wifi for your phone and PC" << std::endl;
-std::cout << "Enter Phyphox IP (example 192.168.0.5:8080): ";
+std::cout << "[NOTICE]: Please make sure you are connected to the same wifi for your phone and PC" << std::endl;
+std::cout << "Enter Phyphox IP (Ex 192.168.1.152): ";
 std::cin >> ip;
 
 Phyphox poller(ip);

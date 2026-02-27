@@ -9,12 +9,11 @@
 using namespace std; 
  
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {  
-    phy_main();
-    return 0; 
-} 
- 
+    phy_main();  
+    return 0;
+}
 // int error(string s){
 //     cerr << s << SDL_GetError()<<endl;
 //     return -1;
