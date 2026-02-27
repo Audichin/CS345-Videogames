@@ -6,7 +6,7 @@
                 "${workspaceFolder}/**",
                 "C:/Users/glimp/vcpkg/installed/x64-windows/include/SDL2",
                 "C:/Users/glimp/vcpkg/installed/x64-mingw-dynamic/include",
-                "C:\\Users\\glimp\\vcpkg\\installed\\x64-windows\\include",
+                "C:/Users/glimp/vcpkg/installed/x64-windows/include",
                 "C:/Users/glimp/vcpkg/installed/x64-mingw-static/include"
             ],
             "compilerPath": "C:/mingw64/bin/gcc.exe",

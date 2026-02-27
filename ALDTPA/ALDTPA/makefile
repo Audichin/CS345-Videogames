@@ -1,29 +1,24 @@
-CXX = clang++
+# BUILD ONLY FROM MSYS2 MINGW64 SHELL
 
-VCPKG_ROOT = C:/Users/glimp/vcpkg
-TRIPLET_STAT = x64-mingw-static
-TRIPLET_WIN = x64-windows
-TRIPLET_DYNAM = x64-mingw-dynamic
+CXX = g++
 
-INCLUDES = -I$(VCPKG_ROOT)/installed/$(TRIPLET)/include \
-           -I$(VCPKG_ROOT)/installed/$(TRIPLET_WIN)/include \
-		   -I$(VCPKG_ROOT)/installed/$(TRIPLET_DYNAM)/include \
-		   -IC:/Users/glimp/vcpkg/installed/x64-windows/include/SDL2
+FLAGS = -std=c++17 -Wall \
+        -IC:/msys64/mingw64/include/SDL2 \
+        -Dmain=SDL_main
 
-LIBDIR = -L$(VCPKG_ROOT)/installed/$(TRIPLET)/lib \
-         -L$(VCPKG_ROOT)/installed/$(TRIPLET_WIN)/lib \
-		 -L$(VCPKG_ROOT)/installed/$(TRIPLET_DYNAM)/lib \
-		 -LC:/Users/glimp/vcpkg/installed/x64-windows/lib
-
-LIBS = -lcurl -lzlib \
-       -lws2_32 -lcrypt32 -lwldap32 -lbcrypt -liphlpapi -lsecur32 -pthread -lSDL2 
-
-CXXFLAGS = -std=c++17 -Wall
+LIBS = -LC:/msys64/mingw64/lib \
+       -lmingw32 \
+       -lSDL2main \
+       -lSDL2 \
+       -lcurl \
+       -lws2_32 -lcrypt32 -lbcrypt \
+       -liphlpapi -lsecur32 -lwldap32 \
+       -pthread
 
 PROJ = main
 
-$(PROJ).exe: $(PROJ).cpp
-	$(CXX) $(PROJ).cpp $(CXXFLAGS) $(INCLUDES) -o $@ $(LIBDIR) $(LIBS) -v
+$(PROJ).exe: main.cpp
+	$(CXX) $< -o $@ $(FLAGS) $(LIBS)
 
 run: $(PROJ).exe
 	./$(PROJ).exe

@@ -13,6 +13,8 @@ LIBDIR = -L$(VCPKG_ROOT)/installed/$(TRIPLET)/lib \
 LIBS = -lcurl -lzlib \
        -lws2_32 -lcrypt32 -lwldap32 -lbcrypt -liphlpapi -lsecur32 -pthread
 
+OTHER_LIBs = -lcurl -lzlib \
+       -lws2_32 -lcrypt32 -lwldap32 -lbcrypt -liphlpapi -lsecur32 -pthread -lSDL2
 CXXFLAGS = -std=c++17 -Wall
 
 PROJ = phyphox

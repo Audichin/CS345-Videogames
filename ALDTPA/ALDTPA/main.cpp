@@ -1,11 +1,20 @@
 #include <SDL.h>
+#include <curl/curl.h>
+#include <nlohmann/json.hpp>
 #include <iostream>
 
-#include "./phyphox.h"
-
+#include "phyphox.cpp"
 #include "main.h"
 
-using namespace std;
+using namespace std; 
+
+
+int main(int argc, char* argv[])
+{
+    cout << "HELLO!" << endl;
+    phy_main();
+    return 0;
+}
 
 // int error(string s){
 //     cerr << s << SDL_GetError()<<endl;
@@ -13,7 +22,7 @@ using namespace std;
 // }
 
 // int init(SDL_Window* &window,SDL_Renderer* &renderer,int width,int height)
-// {
+// { 
 //     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) 
 //     {
 //         return error("SDL could not initialize! SDL_Error: "); 

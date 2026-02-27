@@ -57,6 +57,7 @@ public:
         }while(true);
     }
 
+
 private:
     CURL *curl;
     std::string BaseURL;
@@ -64,6 +65,14 @@ private:
     float prevGyro;
 
     int pause;
+
+    static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) 
+    {
+        size_t totalSize = size * nmemb;
+        std::string* str = static_cast<std::string*>(userp);
+        str->append(static_cast<char*>(contents), totalSize);
+        return totalSize;
+    }
 
     std::string makeURL()
     {
@@ -77,12 +86,6 @@ private:
                          "&gyro_time=" + std::to_string(prevGyro);
     }
 
-    static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
-        size_t totalSize = size * nmemb;
-        std::string* str = static_cast<std::string*>(userp);
-        str->append(static_cast<char*>(contents), totalSize);
-        return totalSize;
-    }
     void JSON(std::string response)
     {
         json j = json::parse(response);
