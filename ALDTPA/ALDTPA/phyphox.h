@@ -121,10 +121,15 @@ private:
                         auto accX = buffer["accX"]["buffer"];
                         auto accY = buffer["accY"]["buffer"];
                         auto accZ = buffer["accZ"]["buffer"];
-                        std::cout << "MADE IT TO ACC" << std::endl;
-                        data.ax = static_cast<float>(accX.back());
-                        data.ay = static_cast<float>(accY.back());
-                        data.az = static_cast<float>(accZ.back());
+                        // std::cout << "MADE IT TO ACC" << std::endl;
+                        // data.ax = static_cast<float>(accX.back());
+                        // data.ay = static_cast<float>(accY.back());
+                        // data.az = static_cast<float>(accZ.back());
+
+                        std::cout << "ACC  | "
+                              << accX.back() << ", "
+                              << accY.back() << ", "
+                              << accZ.back() << std::endl;
                     }
 
                     if (buffer.contains("gyro_time")) 
@@ -133,9 +138,14 @@ private:
                         auto gyroX = buffer["gyroX"]["buffer"];
                         auto gyroY = buffer["gyroY"]["buffer"];
                         auto gyroZ = buffer["gyroZ"]["buffer"];
-                        std::cout << "MADE IT TO GYRO" << std::endl;
+                        std::cout << "GYRO | "
+                              << gyroX.back() << ", "
+                              << gyroY.back() << ", "
+                              << gyroZ.back() << std::endl;
+                        
+                        // std::cout << "MADE IT TO GYRO" << std::endl;
 
-                        data.gx = static_cast<float>(gyroX.back());
+                        // data.gx = static_cast<float>(gyroX.back());
                         // data.gy = static_cast<float>(gyroY.back());
                         // data.gz = static_cast<float>(gyroZ.back());
                     }
@@ -158,7 +168,7 @@ private:
             }
             if (err == 2)
             {
-                std::cout << "[WARN 3]: Data not coming in, unpause Phyphox on phone..." << std::endl;   
+                std::cout << "[WARN 3]: No data from Phyphox, unpause Phyphox on phone..." << std::endl;   
             }
         }
         return data;
