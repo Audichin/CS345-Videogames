@@ -7,15 +7,14 @@
 #include "main.h"
 
 using namespace std; 
+ 
 
-
-int main(int argc, char* argv[])
-{
-    cout << "HELLO!" << endl;
+int main(int argc, char* argv[]) 
+{  
     phy_main();
-    return 0;
-}
-
+    return 0; 
+} 
+ 
 // int error(string s){
 //     cerr << s << SDL_GetError()<<endl;
 //     return -1;

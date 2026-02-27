@@ -11,15 +11,16 @@
 using json = nlohmann::json;
 class Phyphox{
 public:
-    Phyphox(std::string ip) : BaseURL("http://" + ip + "/get"), prevAcc(0.0), prevGyro(0.0), pause(0)
+    Phyphox(std::string ip) : BaseURL("http://" + ip + "/get"), prevAcc(0.0), prevGyro(0.0), pause(0), wait(0)
     {
         curl = curl_easy_init();
     }
 
     ~Phyphox()
     {
-        std::cout << "Deconstructor called, cleaning curl..." << std::endl;
-        if (curl){
+        std::cout << "[NOTICE]: Deconstructor called, cleaning curl..." << std::endl;
+        if (curl)
+        {
             curl_easy_cleanup(curl);
         }
     }
@@ -38,20 +39,20 @@ public:
             CURLcode res = curl_easy_perform(curl);
             if (res == CURLE_OK){
                 JSON(recieve);
+                wait = 0;
             }
             else 
             {
-                pause = 0;
                 if (res != CURLE_OK) 
                 {
                     wait++;
-                    std::cout << "Currl error, waiting: " << 5 - wait << std::endl;
+                    std::cout << "[WARN]: Curl lost connection, waiting: " << 5 - wait << std::endl;
                 }
-                if (wait == 5)
-                {
-                    std::cout << "[ERR]: Lost connection to phone, please check connection and reset phone graphs..." << std::endl;
-                    return -1; // temp for now, hope to reset makeURL to base state and allow game to continue after fixing connection
-                }
+            }
+            if (wait == 5)
+            {
+                std::cout << "[ERR]: Lost connection to phone, please check connection and reset phone graphs..." << std::endl;
+                return -1; // temp for now, hope to reset makeURL to base state and allow game to continue after fixing connection
             }
         std::this_thread::sleep_for(std::chrono::milliseconds(wait));
         }while(true);
@@ -63,8 +64,21 @@ private:
     std::string BaseURL;
     float prevAcc;
     float prevGyro;
-
     int pause;
+    int wait;
+
+    struct IMUData
+    {
+        float ax, ay, az;
+        float gx, gy, gz;
+        bool measuring;
+    };
+
+    double roundTo(double value, int decimals)
+    {
+    double scale = std::pow(10.0, decimals);
+    return std::round(value * scale) / scale;
+    }
 
     static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) 
     {
@@ -86,13 +100,55 @@ private:
                          "&gyro_time=" + std::to_string(prevGyro);
     }
 
-    void JSON(std::string response)
+    IMUData JSON(std::string response)
     {
         json j = json::parse(response);
-        try{
-            std::cout << j << std::endl; 
+        auto& buffer = j["buffer"];
+        bool measuring;
+        IMUData data;
+
+        try
+        {
+            if (j.contains("status"))
+            {
+            measuring = j["status"]["measuring"];
+            data.measuring = j["status"]["measuring"];
+            if (measuring == true)
+            {
+                if (buffer.contains("acc_time")) 
+                {
+                    auto accTimes = buffer["acc_time"]["buffer"];
+                    auto accX = buffer["accX"]["buffer"];
+                    auto accY = buffer["accY"]["buffer"];
+                    auto accZ = buffer["accZ"]["buffer"];
+
+                    data.ax = static_cast<float>(accX.back());
+                    data.ay = static_cast<float>(accY.back());
+                    data.az = static_cast<float>(accZ.back());
+                }
+
+                if (buffer.contains("gyro_time")) 
+                {
+                    auto gyroTimes = buffer["gyro_time"]["buffer"];
+                    auto gyroX = buffer["gyroX"]["buffer"];
+                    auto gyroY = buffer["gyroY"]["buffer"];
+                    auto gyroZ = buffer["gyroZ"]["buffer"];
+
+                    data.gx = static_cast<float>(gyroX.back());
+                    data.gy = static_cast<float>(gyroY.back());
+                    data.gz = static_cast<float>(gyroZ.back());
+
+                }
+            }
+            else
+            {
+               throw; 
+            }
+            }
+
         }
-        catch(...){
+        catch(...)
+        {
             std::cout << "[WARN]: JSON could not parse most recent Phyphox data..." << std::endl;
         }
         
