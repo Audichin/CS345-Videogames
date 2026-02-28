@@ -17,7 +17,7 @@ LIBS = -LC:/msys64/mingw64/lib \
 
 PROJ = main
 
-$(PROJ).exe: main.cpp
+$(PROJ).exe: main.cpp phyphox.cpp phyphox.h main.h
 	$(CXX) $< -o $@ $(FLAGS) $(LIBS)
 
 run: $(PROJ).exe

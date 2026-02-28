@@ -4,6 +4,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <cmath>
 
 #include "curl/curl.h"
 #include <nlohmann/json.hpp>
@@ -44,17 +45,20 @@ public:
             }
             else 
             {
-                if (wait == 5)
+                if (wait == 3)
                 {
                     std::cout << "[ERR]: Lost connection to phone, please check connection and reset phone graphs..." << std::endl;
                     return -1; // temp for now, hope to reset makeURL to base state and allow game to continue after fixing connection
                 }
                 if (res != CURLE_OK) 
                 {
-                    std::cout << "[WARN 1]: Curl lost connection, waiting: " << 5 - wait << std::endl;
+                    std::cout << "[WARN 1]: Curl lost connection, waiting: " << 3 - wait << std::endl;
                     wait++;
+                    Set_prevAcc(0.0);
+                    Set_prevGyro(0.0);
+
                     std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                }
+                } 
             }
         std::this_thread::sleep_for(std::chrono::milliseconds(wait));
         }while(true);
@@ -67,18 +71,42 @@ private:
     float prevGyro;
     int pause;
     int wait = 0;
+    struct IMUData{ float ax, ay, az; float gx, gy, gz; bool measuring;};
 
-    struct IMUData
+    std::string Get_BaseURL()
     {
-        float ax, ay, az;
-        float gx, gy, gz;
-        bool measuring;
-    };
+        return BaseURL;
+    }
 
-    double roundTo(double value, int decimals)
+    float Get_prevAcc()
     {
-    double scale = std::pow(10.0, decimals);
-    return std::round(value * scale) / scale;
+        return prevAcc;
+    }
+
+    float Get_prevGyro()
+    {
+        return prevGyro;
+    }
+
+    void Set_BaseURL(std::string baseurl)
+    {
+        BaseURL = baseurl;
+    }
+
+    void Set_prevAcc(float prevacc)
+    {
+        prevAcc = prevacc;
+    }
+
+    void Set_prevGyro(float prevgyro)
+    {
+        prevGyro = prevgyro;
+    }
+
+    float rounded(float value)
+    {
+        return(std::round(value * 10000.0) / 10000.0);
+        // return value;
     }
 
     static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) 
@@ -122,14 +150,14 @@ private:
                         auto accY = buffer["accY"]["buffer"];
                         auto accZ = buffer["accZ"]["buffer"];
                         // std::cout << "MADE IT TO ACC" << std::endl;
-                        // data.ax = static_cast<float>(accX.back());
-                        // data.ay = static_cast<float>(accY.back());
-                        // data.az = static_cast<float>(accZ.back());
+                        data.ax = static_cast<float>(accX.back());
+                        data.ay = static_cast<float>(accY.back());
+                        data.az = static_cast<float>(accZ.back());
 
                         std::cout << "ACC  | "
-                              << accX.back() << ", "
-                              << accY.back() << ", "
-                              << accZ.back() << std::endl;
+                              << rounded(data.ax) << ", "
+                              << rounded(data.ay) << ", "
+                              << rounded(data.az) << std::endl;
                     }
 
                     if (buffer.contains("gyro_time")) 
@@ -138,16 +166,14 @@ private:
                         auto gyroX = buffer["gyroX"]["buffer"];
                         auto gyroY = buffer["gyroY"]["buffer"];
                         auto gyroZ = buffer["gyroZ"]["buffer"];
-                        std::cout << "GYRO | "
-                              << gyroX.back() << ", "
-                              << gyroY.back() << ", "
-                              << gyroZ.back() << std::endl;
-                        
-                        // std::cout << "MADE IT TO GYRO" << std::endl;
 
-                        // data.gx = static_cast<float>(gyroX.back());
-                        // data.gy = static_cast<float>(gyroY.back());
-                        // data.gz = static_cast<float>(gyroZ.back());
+                        data.gx = static_cast<float>(gyroX.back());
+                        data.gy = static_cast<float>(gyroY.back());
+                        data.gz = static_cast<float>(gyroZ.back());
+                        std::cout << "GYRO | "
+                              << rounded(data.gx) << ", "
+                              << rounded(data.gy) << ", "
+                              << rounded(data.gz) << std::endl; 
                     }
                 }
                 else
