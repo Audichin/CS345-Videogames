@@ -19,4 +19,5 @@ run: $(PROJ).exe
 	./$(PROJ).exe
 
 game:
-	gcc -Wall -Wextra -I/usr/include/SDL2 gamewindow.cpp -o window.exe -lm -L/usr/local/lib -lSDL2
+	g++ -Wall -Wextra -I/usr/include/SDL2 gamewindow.cpp -o window.exe -lm -L/usr/local/lib -lSDL2
+	./window.exe
