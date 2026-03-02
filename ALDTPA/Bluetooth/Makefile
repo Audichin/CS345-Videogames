@@ -1,5 +1,6 @@
 CXX = clang++
 
+
 VCPKG_ROOT = C:/Users/glimp/vcpkg
 TRIPLET = x64-mingw-static
 
@@ -16,3 +17,6 @@ $(PROJ).exe: phyphox.cpp
 
 run: $(PROJ).exe
 	./$(PROJ).exe
+
+game:
+	gcc -Wall -Wextra -I/usr/include/SDL2 gamewindow.cpp -o window.exe -lm -L/usr/local/lib -lSDL2
