@@ -46,7 +46,7 @@ public:
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &recieve);
         
         CURLcode res = curl_easy_perform(curl);
-        std::cout << "TEST" << std::endl;
+
         if (res == CURLE_OK){
 
             data = JSON(recieve);

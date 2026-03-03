@@ -4,7 +4,7 @@
 class Gamewindow
 {
     public:
-        int move()
+        int boot()
         {
 
             return 0;
