@@ -12,6 +12,14 @@
 using json = nlohmann::json;
 class Phyphox{
 public:
+    struct IMUData
+    { 
+        float ax, ay, az; 
+        float gx, gy, gz; 
+        bool measuring;
+        int err;
+    };
+
     Phyphox(std::string ip) : BaseURL("http://" + ip + "/get"), prevAcc(0.0), prevGyro(0.0), pause(0), wait(0)
     {
         curl = curl_easy_init();
@@ -26,42 +34,44 @@ public:
         }
     }
 
-    int Phyphox_loop(int wait)
+    IMUData Phyphox_loop(int wait)
     {
-       wait = 0;
-        do
-        {
-            std::string recieve;
-            std::string url = makeURL();
-            
-            curl_easy_setopt(curl, CURLOPT_URL, url.c_str()); // confused why things are broke
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &recieve);
-            
-            CURLcode res = curl_easy_perform(curl);
-            if (res == CURLE_OK){
-                JSON(recieve);
-                wait = 0;
-            }
-            else 
-            {
-                if (wait == 3)
-                {
-                    std::cout << "[ERR]: Lost connection to phone, please check connection and reset phone graphs..." << std::endl;
-                    return -1; // temp for now, hope to reset makeURL to base state and allow game to continue after fixing connection
-                }
-                if (res != CURLE_OK) 
-                {
-                    std::cout << "[WARN 1]: Curl lost connection, waiting: " << 3 - wait << std::endl;
-                    wait++;
-                    Set_prevAcc(0.0);
-                    Set_prevGyro(0.0);
+        wait = 0;
+        std::string recieve;
+        Phyphox::IMUData data;
+        std::string url = makeURL();
+        
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str()); // confused why things are broke
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &recieve);
+        
+        CURLcode res = curl_easy_perform(curl);
+        std::cout << "TEST" << std::endl;
+        if (res == CURLE_OK){
 
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                } 
-            }
+            data = JSON(recieve);
+            wait = 0;
+        }
+        else 
+        {
+            // if (wait == 3)
+            // {
+            //     std::cout << "[ERR]: Lost connection to phone, please check connection and reset phone graphs..." << std::endl;
+            //     data.err = -1;
+            //     return data; // temp for now, hope to reset makeURL to base state and allow game to continue after fixing connection
+            // }
+            if (res != CURLE_OK) 
+            {
+                std::cout << "[WARN 1]: Curl cannot find connection" << std::endl;
+                // wait++;
+                Set_prevAcc(0.0);
+                Set_prevGyro(0.0);
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(wait));
+            } 
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(wait));
-        }while(true);
+    return data;
     }
 
 private:
@@ -71,7 +81,7 @@ private:
     float prevGyro;
     int pause;
     int wait = 0;
-    struct IMUData{ float ax, ay, az; float gx, gy, gz; bool measuring;};
+
 
     std::string Get_BaseURL()
     {
@@ -106,7 +116,6 @@ private:
     float rounded(float value)
     {
         return(std::round(value * 10000.0) / 10000.0);
-        // return value;
     }
 
     static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) 
@@ -149,15 +158,15 @@ private:
                         auto accX = buffer["accX"]["buffer"];
                         auto accY = buffer["accY"]["buffer"];
                         auto accZ = buffer["accZ"]["buffer"];
-                        // std::cout << "MADE IT TO ACC" << std::endl;
-                        data.ax = static_cast<float>(accX.back());
-                        data.ay = static_cast<float>(accY.back());
-                        data.az = static_cast<float>(accZ.back());
+
+                        data.ax =  rounded(static_cast<float>(accX.back()));
+                        data.ay =  rounded(static_cast<float>(accY.back()));
+                        data.az =  rounded(static_cast<float>(accZ.back()));
 
                         std::cout << "ACC  | "
-                              << rounded(data.ax) << ", "
-                              << rounded(data.ay) << ", "
-                              << rounded(data.az) << std::endl;
+                              << data.ax << ", "
+                              << data.ay << ", "
+                              << data.az << std::endl;
                     }
 
                     if (buffer.contains("gyro_time")) 
@@ -167,13 +176,14 @@ private:
                         auto gyroY = buffer["gyroY"]["buffer"];
                         auto gyroZ = buffer["gyroZ"]["buffer"];
 
-                        data.gx = static_cast<float>(gyroX.back());
-                        data.gy = static_cast<float>(gyroY.back());
-                        data.gz = static_cast<float>(gyroZ.back());
+                        data.gx =  rounded(static_cast<float>(gyroX.back()));
+                        data.gy =  rounded(static_cast<float>(gyroY.back()));
+                        data.gz =  rounded(static_cast<float>(gyroZ.back()));
+
                         std::cout << "GYRO | "
-                              << rounded(data.gx) << ", "
-                              << rounded(data.gy) << ", "
-                              << rounded(data.gz) << std::endl; 
+                              << data.gx << ", "
+                              << data.gy << ", "
+                              << data.gz << std::endl; 
                     }
                 }
                 else

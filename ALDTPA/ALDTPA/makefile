@@ -15,9 +15,9 @@ LIBS = -LC:/msys64/mingw64/lib \
        -liphlpapi -lsecur32 -lwldap32 \
        -pthread
 
-PROJ = main
+PROJ = gamewindow.cpp
 
-$(PROJ).exe: main.cpp phyphox.cpp phyphox.h main.h
+$(PROJ).exe: gamewindow.cpp gamewindow.h phyphox.h 
 	$(CXX) $< -o $@ $(FLAGS) $(LIBS)
 
 run: $(PROJ).exe
