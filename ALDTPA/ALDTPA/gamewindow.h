@@ -3,5 +3,11 @@
 
 class Gamewindow
 {
+    public:
+        int move()
+        {
 
+            return 0;
+        }
+        
 };

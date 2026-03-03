@@ -36,10 +36,10 @@ public:
 
     IMUData Phyphox_loop(int wait)
     {
-        wait = 0;
         std::string recieve;
         Phyphox::IMUData data;
         std::string url = makeURL();
+        data.err = 0;
         
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str()); // confused why things are broke
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
@@ -66,11 +66,11 @@ public:
                 // wait++;
                 Set_prevAcc(0.0);
                 Set_prevGyro(0.0);
-
-                std::this_thread::sleep_for(std::chrono::milliseconds(wait));
+                data.err = 1;
+                return data;
             } 
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(wait));
+        // std::this_thread::sleep_for(std::chrono::milliseconds(wait));
     return data;
     }
 

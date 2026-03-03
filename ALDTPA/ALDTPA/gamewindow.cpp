@@ -10,6 +10,7 @@
 int main(int argc, char* argv[])
 {
     std::string ip;
+    Phyphox::IMUData movement;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0){ // Initalizes SDL and throws and error if it did not initalize
         std::cerr <<"SDL_Init failed: " <<SDL_GetError() << std::endl;
@@ -17,13 +18,12 @@ int main(int argc, char* argv[])
     }
 
 
-    SDL_Window* window = SDL_CreateWindow("Game Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_SHOWN); //creates the window variable
+    SDL_Window* window = SDL_CreateWindow("Game Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 1000, SDL_WINDOW_SHOWN); //creates the window variable
     if (!window){ // if the window doesn't exist throws an error and quits the application
         std::cerr <<"SDL_CreateWindow failed" << SDL_GetError()<< std::endl;
         SDL_Quit();
         return 1;
     }
-
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED); //creates a renderer to operate in the window
     if (!renderer) { // if renderer doesn't exist, closes the window and quits the application
@@ -41,8 +41,8 @@ int main(int argc, char* argv[])
     Phyphox poller(ip);
     std::cout << "Starting poll...\n";
 
-
-
+    SDL_Rect rect = {500, 500, 50, 50}; // (pos.x, pos.y, len.x, len.y) creates shape of given size at given position
+    SDL_Rect change_rect = rect;
 
     bool running = true; //a bool for the game state
     while (running) 
@@ -56,15 +56,24 @@ int main(int argc, char* argv[])
             }
         }
 
-        poller.Phyphox_loop(50);
+        movement = poller.Phyphox_loop(50);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // colors the window black (0,0,0) no transparacy (255)
         SDL_RenderClear(renderer); //clears the render color
 
-        SDL_Rect rect = {30, 30, 50, 50}; // (pos.x, pos.y, len.x, len.y) creates shape of given size at given position
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); //sets color to red (255,0,0), no transparacy (255)
-        SDL_RenderFillRect(renderer, &rect); //creates rect using renderer and shape dimensions
+        // LIST OF THINGS TO ADD HERE FOR FUTURE:
+        // 1) Add smoothness so movement isn't clunky
+        // 2) If a data point is 0, just assume 0 change
+        // 3) Find out how to use phone movement to change position
+        // 4) Add a way to change sensitivity
+        // 5) Maybe improve lag / responce times?
+        
+        change_rect.x += movement.ax;
+        change_rect.y += movement.ay;
 
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); //sets color to red (255,0,0), no transparacy (255)
+        SDL_RenderFillRect(renderer, &change_rect); //creates rect using renderer and shape dimensions
+        
 
         SDL_RenderPresent(renderer); // update screen
 
