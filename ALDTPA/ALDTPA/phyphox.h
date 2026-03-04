@@ -18,6 +18,7 @@ public:
         float gx, gy, gz; 
         bool measuring;
         int err;
+        int wait;
     };
 
     Phyphox(std::string ip) : BaseURL("http://" + ip + "/get"), prevAcc(0.0), prevGyro(0.0), pause(0), wait(0)
@@ -34,7 +35,7 @@ public:
         }
     }
 
-    IMUData Phyphox_loop(int wait)
+    IMUData Phyphox_loop()
     {
         std::string recieve;
         Phyphox::IMUData data;
@@ -50,23 +51,22 @@ public:
         if (res == CURLE_OK){
 
             data = JSON(recieve);
-            wait = 0;
+            data.wait = 0;
         }
         else 
         {
-            // if (wait == 3)
-            // {
-            //     std::cout << "[ERR]: Lost connection to phone, please check connection and reset phone graphs..." << std::endl;
-            //     data.err = -1;
-            //     return data; // temp for now, hope to reset makeURL to base state and allow game to continue after fixing connection
-            // }
+            if (data.wait == 3)
+            {
+                std::cout << "[ERR]: Lost connection to phone, please check connection and reset phone graphs..." << std::endl;
+                data.err = 1;
+                return data; // temp for now, hope to reset makeURL to base state and allow game to continue after fixing connection
+            }
             if (res != CURLE_OK) 
             {
                 std::cout << "[WARN 1]: Curl cannot find connection" << std::endl;
-                // wait++;
+                data.wait++;
                 Set_prevAcc(0.0);
                 Set_prevGyro(0.0);
-                data.err = 1;
                 return data;
             } 
         }
