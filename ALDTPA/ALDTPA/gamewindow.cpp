@@ -60,6 +60,7 @@ int main(int argc, char* argv[])
         // 4) Add a way to change sensitivity
         // 5) Maybe improve lag / responce times?
         // 6) Find out why it drifts when data is 0
+        // 7) ***Fix deconstuctor running to segmentation fault upon exiting game***
         
         movement = poller.Phyphox_loop();
         
@@ -91,7 +92,6 @@ int main(int argc, char* argv[])
         }
     }
 
-    //runs after game is not running
     game.terminate(game.window, game.renderer, game.texture, game.surface);
 
     return 0;
@@ -122,3 +122,4 @@ void center(Gamewindow& game, int screen_width, int screen_height)
     game.rect.x = (screen_width / 2) - (game.rect.w / 2);
     game.rect.y = (screen_height / 2) - (game.rect.h / 2);
 }
+
