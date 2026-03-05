@@ -25,6 +25,7 @@ int main(int argc, char* argv[])
     // 1) Add more error handling
     // 2) Create an easier way to make screen size bigger and scale play to center space (for now)
     // 3) Add better image handling and when collision is made (for simple start to actual game)
+    //  a) find a way to inculde BMP files from different folder so it isn't in main folder
     // 4) Move IP input to a dedicated pop up before game launches to avoid game 
     //  to not respond on boot if IP has not been entered yet
 
@@ -60,7 +61,7 @@ int main(int argc, char* argv[])
         // 4) Add a way to change sensitivity
         // 5) Maybe improve lag / responce times?
         // 6) Find out why it drifts when data is 0
-        // 7) ***Fix deconstuctor running to segmentation fault upon exiting game***
+        // 8) ***Fix deconstuctor running to segmentation fault upon exiting game***
         
         movement = poller.Phyphox_loop();
         
