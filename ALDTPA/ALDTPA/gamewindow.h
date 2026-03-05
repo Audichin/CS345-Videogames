@@ -11,7 +11,7 @@ class Gamewindow
         SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED); //creates a renderer to operate in the window
 
 
-        SDL_Rect rect = {300, 100, 50, 50}; // (pos.x, pos.y, len.x, len.y) creates shape of given size at given position
+        SDL_Rect rect = {0, 0, 50, 50}; // (pos.x, pos.y, len.x, len.y) creates shape of given size at given position
         bool running = true; //a bool for the game state
 
 
@@ -20,13 +20,13 @@ class Gamewindow
             
             if (SDL_Init(SDL_INIT_VIDEO) < 0) // Initalizes SDL and throws and error if it did not initalize
             { 
-            std::cerr <<"SDL_Init failed: " <<SDL_GetError() << std::endl;
+            std::cerr <<"[ERR]: SDL_Init failed: " <<SDL_GetError() << std::endl;
             return 1;
             }
 
             if (!window) // if the window doesn't exist throws an error and quits the application
             { 
-                std::cerr <<"SDL_CreateWindow failed" << SDL_GetError()<< std::endl;
+                std::cerr <<"[ERR]: SDL_CreateWindow failed" << SDL_GetError()<< std::endl;
                 SDL_Quit();
                 return 1;
             }
@@ -34,16 +34,19 @@ class Gamewindow
             
             if (!renderer) // if renderer doesn't exist, closes the window and quits the application
             { 
-                std::cerr << "SDL_CreateRenderer failed: " << SDL_GetError() << std::endl;
+                std::cerr <<"[ERR]: SDL_CreateRenderer failed: " << SDL_GetError() << std::endl;
                 SDL_DestroyWindow(window);
                 SDL_Quit();
                 return 1;
             }
+        return 0;
         }
         void terminate(SDL_Window* win, SDL_Renderer* ren)
         {
+            std::cout << "[NOTICE]: Terminating game window..." << std::endl;
             SDL_DestroyRenderer(ren); //delete renderer obj
             SDL_DestroyWindow(win); //delete window obj
             SDL_Quit(); //quit SQL
         }
+
 };

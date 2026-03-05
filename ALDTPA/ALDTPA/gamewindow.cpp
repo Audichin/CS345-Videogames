@@ -7,6 +7,8 @@
 #include "phyphox.h"
 #include "gamewindow.h"
 
+void check_bounds(Gamewindow& game, int screen_width, int screen_height);
+
 int main(int argc, char* argv[])
 {
     std::string ip;
@@ -26,13 +28,14 @@ int main(int argc, char* argv[])
     //  to not respond on boot if IP has not been entered yet
 
     std::cout << "[NOTICE]: Please make sure you are connected to the same wifi for your phone and PC" << std::endl;
-    // std::cout << "Enter Phyphox IP (Ex 192.168.1.152): ";
-    // std::cin >> ip;
-    ip = "10.4.46.233";
+    std::cout << "Enter Phyphox IP (Ex 192.168.1.152): ";
+    std::cin >> ip;
 
     Phyphox poller(ip);
     std::cout << "Starting poll...\n";
 
+    center(game, game.width, game.height);
+    
     while (game.running) 
     { //constantly runs
         SDL_Event event; //creates variable to store key presses or similar player interaction
@@ -95,4 +98,10 @@ void check_bounds(Gamewindow& game, int screen_width, int screen_height)
         {
             game.rect.y = screen_height - 25;
         }
+}
+
+void center(Gamewindow& game, int screen_width, int screen_height)
+{
+    game.rect.x = (screen_width / 2) - (game.rect.w / 2);
+    game.rect.y = (screen_height / 2) - (game.rect.h / 2);
 }
