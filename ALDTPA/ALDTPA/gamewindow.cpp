@@ -8,6 +8,7 @@
 #include "gamewindow.h"
 
 void check_bounds(Gamewindow& game, int screen_width, int screen_height);
+void center(Gamewindow& game, int screen_width, int screen_height);
 
 int main(int argc, char* argv[])
 {
@@ -15,16 +16,16 @@ int main(int argc, char* argv[])
     Phyphox::IMUData movement;
 
     Gamewindow game;
+
     if (game.boot() == 1)
     {
         return 1;
     }
     // LIST OF THINGS TO ADD HERE FOR FUTURE:
-    // 1) Move this into a class
-    // 2) Add more error handling
-    // 3) Create an easier way to make screen size bigger and scale play to center space (for now)
-    // 4) Add image rendering and handling when collision is made (for simmple start to actual game)
-    // 5) move IP input to a dedicated pop up before game launches to avoid game 
+    // 1) Add more error handling
+    // 2) Create an easier way to make screen size bigger and scale play to center space (for now)
+    // 3) Add better image handling and when collision is made (for simple start to actual game)
+    // 4) Move IP input to a dedicated pop up before game launches to avoid game 
     //  to not respond on boot if IP has not been entered yet
 
     std::cout << "[NOTICE]: Please make sure you are connected to the same wifi for your phone and PC" << std::endl;
@@ -35,19 +36,22 @@ int main(int argc, char* argv[])
     std::cout << "Starting poll...\n";
 
     center(game, game.width, game.height);
-    
+
     while (game.running) 
     { //constantly runs
         SDL_Event event; //creates variable to store key presses or similar player interaction
         while (SDL_PollEvent(&event) != 0)
         { 
-            if (event.type == SDL_QUIT || movement.err == 1) 
+            if (event.type == SDL_QUIT) 
             {
                 game.running = false; //when quit event happens, stop the game
             }
+
         }
+        SDL_RenderClear(game.renderer); //clears the renderer to be redrawn on the window
+        SDL_RenderCopy(game.renderer, game.texture, NULL, &game.rect); //copies the texture to the renderer to be drawn on the window
         SDL_SetRenderDrawColor(game.renderer, 0, 0, 0, 255); // colors the window black (0,0,0) no transparacy (255)
-        SDL_RenderClear(game.renderer); //clears the render color
+
 
         // LIST OF THINGS TO ADD HERE FOR FUTURE:
         // 1) Add smoothness so movement isn't clunky
@@ -55,27 +59,40 @@ int main(int argc, char* argv[])
         // 3) Find out how to use phone movement to change position
         // 4) Add a way to change sensitivity
         // 5) Maybe improve lag / responce times?
+        // 6) Find out why it drifts when data is 0
         
         movement = poller.Phyphox_loop();
         
-        game.rect.x += movement.ax; 
-        game.rect.y += movement.ay;
+        if (movement.warn == true)
+        {
+            movement.ax = poller.Get_prevAcc();
+            movement.gx = poller.Get_prevGyro();
+        }
+        else
+        {
+            game.rect.x += movement.ax; 
+            game.rect.y += movement.ay;
+        }
 
         check_bounds(game, game.width, game.height);
 
         std::cout << "X: " << game.rect.x << " | Y: " << game.rect.y << std::endl;
 
-        SDL_SetRenderDrawColor(game.renderer, 255, 0, 0, 255); //sets color to red (255,0,0), no transparacy (255)
-        SDL_RenderFillRect(game.renderer, &game.rect); //creates rect using renderer and shape dimensions       
+        // SDL_SetRenderDrawColor(game.renderer, 255, 0, 0, 255); //sets color to red (255,0,0), no transparacy (255)
+        // SDL_RenderFillRect(game.renderer, &game.rect); //creates rect using renderer and shape dimensions       
 
         SDL_RenderPresent(game.renderer); // update screen
 
         SDL_Delay(1000/60); //sets a frame limit of 60fps
 
+        if (movement.err == 1)
+        {
+            game.running = false;
+        }
     }
 
     //runs after game is not running
-    game.terminate(game.window, game.renderer);
+    game.terminate(game.window, game.renderer, game.texture, game.surface);
 
     return 0;
 }
