@@ -1,5 +1,5 @@
 #include <iostream>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <vector>
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
