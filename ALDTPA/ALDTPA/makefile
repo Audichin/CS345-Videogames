@@ -23,5 +23,7 @@ $(PROJ).exe: gamewindow.cpp gamewindow.h phyphox.h
 run: $(PROJ).exe
 	./$(PROJ).exe
 
-clean:
-	rm -f $(PROJ).exe *.o
+# game: 
+#         $(PROJ).exe gamewindow.cpp gamewindow.h phyphox.h 
+#         $(CXX) $< -o $@ $(FLAGS) $(LIBS)
+#         ./$(PROJ).exe
