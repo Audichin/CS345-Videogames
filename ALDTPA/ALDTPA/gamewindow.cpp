@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
             game.rect.x += movement.ax; 
             game.rect.y += movement.ay;
         }
-
+  
         check_bounds(game, game.width, game.height);
 
         std::cout << "X: " << game.rect.x << " | Y: " << game.rect.y << std::endl;
