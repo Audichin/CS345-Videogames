@@ -17,6 +17,7 @@ public:
         float ax, ay, az; 
         float gx, gy, gz; 
         bool measuring;
+        bool warn;
         int err;
         int wait;
     };
@@ -70,18 +71,8 @@ public:
                 return data;
             } 
         }
-        // std::this_thread::sleep_for(std::chrono::milliseconds(wait));
-    return data;
+        return data;
     }
-
-private:
-    CURL *curl;
-    std::string BaseURL;
-    float prevAcc;
-    float prevGyro;
-    int pause;
-    int wait = 0;
-
 
     std::string Get_BaseURL()
     {
@@ -112,6 +103,14 @@ private:
     {
         prevGyro = prevgyro;
     }
+
+private:
+    CURL *curl;
+    std::string BaseURL;
+    float prevAcc;
+    float prevGyro;
+    int pause;
+    int wait = 0;
 
     float rounded(float value)
     {
@@ -201,10 +200,12 @@ private:
             if (err == 1)
             {
                 std::cout << "[WARN 2]: JSON could not parse most recent Phyphox data..." << std::endl;
+                data.warn = true;
             }
             if (err == 2)
             {
                 std::cout << "[WARN 3]: No data from Phyphox, unpause Phyphox on phone..." << std::endl;   
+                data.warn = true;
             }
         }
         return data;
