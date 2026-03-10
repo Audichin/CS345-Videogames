@@ -16,6 +16,8 @@ int main(int argc, char* argv[])
     Phyphox::IMUData movement;
     SDL_Event event;
     Gamewindow game;
+    int clear_counter = 0;
+    static int frame = 0;
 
     if (game.boot() == 1)
     {
@@ -52,14 +54,24 @@ int main(int argc, char* argv[])
         SDL_SetRenderDrawColor(game.Get_renderer(), 0, 0, 0, 255); // colors the window black (0,0,0) no transparacy (255)
 
         // LIST OF THINGS TO ADD HERE FOR FUTURE:
-        // 1) Add smoothness so movement isn't clunky
-        // 2) If a data point is 0, just assume 0 change
-        // 3) Find out how to use phone movement to change position
-        // 4) Add a way to change sensitivity
-        // 5) Maybe improve lag / responce times?
+        // 1) If a data point is 0, just assume 0 change
+        // 2) Find out how to use phone movement to change position
+        // 3) Add a way to change sensitivity
 
-        movement = poller.Phyphox_loop();
-        
+        if(frame % 3 == 0)
+        {
+            movement = poller.Phyphox_loop();
+        }
+
+        frame++;
+        clear_counter++;
+
+        if(clear_counter > 600)   // about 10 seconds at 60 FPS
+        {
+            poller.ClearBuffers();
+            clear_counter = 0;
+        }
+
         if (movement.warn == true)
         {
             movement.direct = poller.Get_prevDirect();
