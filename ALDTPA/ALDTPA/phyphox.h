@@ -13,16 +13,27 @@ using json = nlohmann::json;
 class Phyphox{
 public:
     struct IMUData
-    { 
-        float ax, ay, az; 
-        float gx, gy, gz; 
+    {
+        float direct;
+        float yaw;
+        float pitch;
+        float roll;
+        float attT;
         bool measuring;
         bool warn;
         int err;
         int wait;
     };
 
-    Phyphox(std::string ip) : BaseURL("http://" + ip + "/get"), prevAcc(0.0), prevGyro(0.0), pause(0), wait(0)
+    Phyphox(std::string ip) 
+    : BaseURL("http://" + ip + "/get"), 
+    prevDirect(0.0), 
+    prevYaw(0.0), 
+    prevPitch(0.0), 
+    prevRoll(0.0), 
+    prevAttT(0.0),
+    pause(0), 
+    wait(0)
     {
         curl = curl_easy_init();
     }
@@ -39,20 +50,27 @@ public:
     IMUData Phyphox_loop()
     {
         std::string recieve;
-        Phyphox::IMUData data;
+        IMUData data{};
+
         std::string url = makeURL();
-        data.err = 0;
-        
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str()); // confused why things are broke
+
+        curl_easy_reset(curl);
+
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &recieve);
-        
+
         CURLcode res = curl_easy_perform(curl);
 
         if (res == CURLE_OK){
-
-            data = JSON(recieve);
             data.wait = 0;
+            data = JSON(recieve);
+
+            prevDirect = data.direct;
+            prevYaw = data.yaw;
+            prevPitch = data.pitch;
+            prevRoll = data.roll;
+            prevAttT = data.attT;
         }
         else 
         {
@@ -65,9 +83,7 @@ public:
             if (res != CURLE_OK) 
             {
                 std::cout << "[WARN 1]: Curl cannot find connection" << std::endl;
-                data.wait++;
-                Set_prevAcc(0.0);
-                Set_prevGyro(0.0);
+                data.wait += 1;
                 return data;
             } 
         }
@@ -79,14 +95,34 @@ public:
         return BaseURL;
     }
 
-    float Get_prevAcc()
+    float Get_prevDirect()
     {
-        return prevAcc;
+        return prevDirect;
     }
 
-    float Get_prevGyro()
+    float Get_prevYaw()
     {
-        return prevGyro;
+        return prevYaw;
+    }
+
+    float Get_prevPitch()
+    {
+        return prevPitch;
+    }
+
+    float Get_prevRoll()
+    {
+        return prevRoll;
+    }
+
+    float Get_wait()
+    {
+        return wait;
+    }
+
+    float Get_pause()
+    {
+        return pause;
     }
 
     void Set_BaseURL(std::string baseurl)
@@ -94,21 +130,35 @@ public:
         BaseURL = baseurl;
     }
 
-    void Set_prevAcc(float prevacc)
+    void Set_prevDirect(float prevdirect)
     {
-        prevAcc = prevacc;
+        prevDirect = prevdirect;
     }
 
-    void Set_prevGyro(float prevgyro)
+    void Set_prevYaw(float prevyaw)
     {
-        prevGyro = prevgyro;
+        prevYaw = prevyaw;
+    }
+
+    void Set_prevPitch(float prevpitch)
+    {
+        prevPitch = prevpitch;
+    }
+
+    void Set_prevRoll(float prevroll)
+    {
+        prevRoll = prevroll;
     }
 
 private:
     CURL *curl;
     std::string BaseURL;
-    float prevAcc;
-    float prevGyro;
+    float prevDirect;
+    float prevYaw;
+    float prevPitch;
+    float prevRoll;
+    float prevAttT;
+
     int pause;
     int wait = 0;
 
@@ -127,14 +177,12 @@ private:
 
     std::string makeURL()
     {
-        return BaseURL + "?accX=" + std::to_string(prevAcc) + "|acc_time" +
-                         "&accY=" + std::to_string(prevAcc) + "|acc_time" +
-                         "&accZ=" + std::to_string(prevAcc) + "|acc_time" +
-                         "&acc_time=" + std::to_string(prevAcc) +
-                         "&gyroX=" + std::to_string(prevGyro) + "|gyro_time" +
-                         "&gyroY=" + std::to_string(prevGyro) + "|gyro_time" +
-                         "&gyroZ=" + std::to_string(prevGyro) + "|gyro_time" +
-                         "&gyro_time=" + std::to_string(prevGyro);
+        return BaseURL + "?direct=" + std::to_string(prevDirect) + "|attT" +
+                         "&attT=" + std::to_string(prevAttT) +
+                         "&yaw=" + std::to_string(prevYaw) + "|attT" +
+                         "&pitch=" + std::to_string(prevPitch) + "|attT" +
+                         "&roll=" + std::to_string(prevRoll) + "|attT";
+
     }
 
     IMUData JSON(std::string response)
@@ -142,7 +190,8 @@ private:
         json j = json::parse(response);
         auto& buffer = j["buffer"];
         bool measuring;
-        IMUData data;
+        IMUData data{};
+
         try
         {
             if (j.contains("status"))
@@ -151,38 +200,58 @@ private:
                 data.measuring = j["status"]["measuring"];
                 if (measuring == true)
                 {
-                    if (buffer.contains("acc_time")) 
+                    if (buffer.contains("direct")) 
                     {
-                        auto accTimes = buffer["acc_time"]["buffer"];
-                        auto accX = buffer["accX"]["buffer"];
-                        auto accY = buffer["accY"]["buffer"];
-                        auto accZ = buffer["accZ"]["buffer"];
-
-                        data.ax =  rounded(static_cast<float>(accX.back()));
-                        data.ay =  rounded(static_cast<float>(accY.back()));
-                        data.az =  rounded(static_cast<float>(accZ.back()));
-
-                        std::cout << "ACC  | "
-                              << data.ax << ", "
-                              << data.ay << ", "
-                              << data.az << std::endl;
+                        auto direct = buffer["direct"]["buffer"];
+                        if (!direct.empty())
+                        {
+                            data.direct = rounded(static_cast<float>(direct.back()));
+                        }
+                        std::cout << "Direct  | "
+                              << data.direct << std::endl;
                     }
 
-                    if (buffer.contains("gyro_time")) 
+                    if (buffer.contains("attT")) 
                     {
-                        auto gyroTimes = buffer["gyro_time"]["buffer"];
-                        auto gyroX = buffer["gyroX"]["buffer"];
-                        auto gyroY = buffer["gyroY"]["buffer"];
-                        auto gyroZ = buffer["gyroZ"]["buffer"];
-
-                        data.gx =  rounded(static_cast<float>(gyroX.back()));
-                        data.gy =  rounded(static_cast<float>(gyroY.back()));
-                        data.gz =  rounded(static_cast<float>(gyroZ.back()));
-
-                        std::cout << "GYRO | "
-                              << data.gx << ", "
-                              << data.gy << ", "
-                              << data.gz << std::endl; 
+                        auto attT = buffer["attT"]["buffer"];
+                        if (!attT.empty())
+                        {
+                            data.attT = rounded(static_cast<float>(attT.back()));
+                        }
+                        std::cout << "Timestamp | "
+                              << data.yaw << ", "
+                              << data.pitch << ", "
+                              << data.roll << std::endl; 
+                    }
+                if (buffer.contains("pitch")) 
+                    {
+                        auto pitch = buffer["pitch"]["buffer"];
+                        if (!pitch.empty())
+                        {
+                            data.pitch = rounded(static_cast<float>(pitch.back()));
+                        }
+                        std::cout << "Pitch  | "
+                              << data.pitch << std::endl; 
+                    }
+                if (buffer.contains("roll")) 
+                    {
+                        auto roll = buffer["roll"]["buffer"];
+                        if (!roll.empty())
+                        {
+                            data.roll = rounded(static_cast<float>(roll.back()));
+                        }
+                        std::cout << "Roll  | "
+                              << data.roll << std::endl; 
+                    }
+                if (buffer.contains("yaw")) 
+                    {
+                        auto yaw = buffer["yaw"]["buffer"];
+                        if (!yaw.empty())
+                        {
+                            data.yaw = rounded(static_cast<float>(yaw.back()));
+                        }
+                        std::cout << "Yaw  | "
+                              << data.yaw << std::endl; 
                     }
                 }
                 else

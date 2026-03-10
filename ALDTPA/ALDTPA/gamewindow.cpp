@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 {
     std::string ip;
     Phyphox::IMUData movement;
-
+    SDL_Event event;
     Gamewindow game;
 
     if (game.boot() == 1)
@@ -36,23 +36,20 @@ int main(int argc, char* argv[])
     Phyphox poller(ip);
     std::cout << "Starting poll...\n";
 
-    center(game, game.width, game.height);
+    center(game, game.Get_width(), game.Get_height());
 
-    while (game.running) 
+    while (game.Get_running()) 
     { //constantly runs
-        SDL_Event event; //creates variable to store key presses or similar player interaction
         while (SDL_PollEvent(&event) != 0)
         { 
             if (event.type == SDL_QUIT) 
             {
-                game.running = false; //when quit event happens, stop the game
+                game.Set_running(false); //when quit event happens, stop the game
             }
-
         }
-        SDL_RenderClear(game.renderer); //clears the renderer to be redrawn on the window
-        SDL_RenderCopy(game.renderer, game.texture, NULL, &game.rect); //copies the texture to the renderer to be drawn on the window
-        SDL_SetRenderDrawColor(game.renderer, 0, 0, 0, 255); // colors the window black (0,0,0) no transparacy (255)
-
+        SDL_RenderClear(game.Get_renderer()); //clears the renderer to be redrawn on the window
+        SDL_RenderCopy(game.Get_renderer(), game.Get_texture(), NULL, &game.Get_rect()); //copies the texture to the renderer to be drawn on the window
+        SDL_SetRenderDrawColor(game.Get_renderer(), 0, 0, 0, 255); // colors the window black (0,0,0) no transparacy (255)
 
         // LIST OF THINGS TO ADD HERE FOR FUTURE:
         // 1) Add smoothness so movement isn't clunky
@@ -60,67 +57,65 @@ int main(int argc, char* argv[])
         // 3) Find out how to use phone movement to change position
         // 4) Add a way to change sensitivity
         // 5) Maybe improve lag / responce times?
-        // 6) Find out why it drifts when data is 0
-        // 8) ***Fix deconstuctor running to segmentation fault upon exiting game***
-        
+
         movement = poller.Phyphox_loop();
         
         if (movement.warn == true)
         {
-            movement.ax = poller.Get_prevAcc();
-            movement.gx = poller.Get_prevGyro();
-        }
+            movement.direct = poller.Get_prevDirect();
+            movement.yaw = poller.Get_prevYaw();
+            movement.pitch = poller.Get_prevPitch();
+            movement.roll = poller.Get_prevRoll();
+        } 
         else
         {
-            game.rect.x += movement.ax; 
-            game.rect.y += movement.ay;
+            game.Set_rect({game.Get_rect().x + static_cast<int>(movement.direct/3.50 - poller.Get_prevDirect()/3.50), 
+            game.Get_rect().y + static_cast<int>(movement.pitch), game.Get_rect().w, game.Get_rect().h});
         }
   
-        check_bounds(game, game.width, game.height);
+        check_bounds(game, game.Get_width(), game.Get_height());
 
-        std::cout << "X: " << game.rect.x << " | Y: " << game.rect.y << std::endl;
+        std::cout << "X: " << game.Get_rect().x << " | Y: " << game.Get_rect().y << std::endl;
 
-        // SDL_SetRenderDrawColor(game.renderer, 255, 0, 0, 255); //sets color to red (255,0,0), no transparacy (255)
-        // SDL_RenderFillRect(game.renderer, &game.rect); //creates rect using renderer and shape dimensions       
+        // SDL_SetRenderDrawColor(game.Get_renderer(), 255, 0, 0, 255); //sets color to red (255,0,0), no transparacy (255)
+        // SDL_RenderFillRect(game.Get_renderer(), &game.Get_rect()); //creates rect using renderer and shape dimensions       
 
-        SDL_RenderPresent(game.renderer); // update screen
+        SDL_RenderPresent(game.Get_renderer()); // update screen
 
         SDL_Delay(1000/60); //sets a frame limit of 60fps
 
         if (movement.err == 1)
         {
-            game.running = false;
+            game.Set_running(false);
         }
     }
-
-    game.terminate(game.window, game.renderer, game.texture, game.surface);
 
     return 0;
 }
 
 void check_bounds(Gamewindow& game, int screen_width, int screen_height)
 {
-        if (game.rect.x > screen_width) 
+        if (game.Get_rect().x > screen_width) 
         {
-            game.rect.x = 25;
+            game.Set_rect({25, game.Get_rect().y, game.Get_rect().w, game.Get_rect().h});
         }
-        if (game.rect.y > screen_height) 
+        if (game.Get_rect().y > screen_height) 
         {
-            game.rect.y = 25;
+            game.Set_rect({game.Get_rect().x, 25, game.Get_rect().w, game.Get_rect().h});
         } 
-        if (game.rect.x < 0) 
+        if (game.Get_rect().x < 0) 
         {
-            game.rect.x = screen_width - 25;
+            game.Set_rect({screen_width - 25, game.Get_rect().y, game.Get_rect().w, game.Get_rect().h});
         }
-        if (game.rect.y < 0) 
+        if (game.Get_rect().y < 0) 
         {
-            game.rect.y = screen_height - 25;
+            game.Set_rect({game.Get_rect().x, screen_height - 25, game.Get_rect().w, game.Get_rect().h});
         }
 }
 
 void center(Gamewindow& game, int screen_width, int screen_height)
 {
-    game.rect.x = (screen_width / 2) - (game.rect.w / 2);
-    game.rect.y = (screen_height / 2) - (game.rect.h / 2);
+    game.Set_rect({(screen_width / 2) - (game.Get_rect().w / 2), \
+    (screen_height / 2) - (game.Get_rect().h / 2), game.Get_rect().w, game.Get_rect().h});
 }
 
