@@ -6,9 +6,8 @@
 class Gamewindow
 {
 public:
-
     Gamewindow()
-        : width(640), height(480), rect{0,0,50,50}, running(true)
+        : width(640), height(480), rect{0, 0, 50, 50}, running(true)
     {
         std::cout << "[NOTICE]: Constructor called, initializing game window..." << std::endl;
     }
@@ -17,10 +16,14 @@ public:
     {
         std::cout << "[NOTICE]: Destructor called, cleaning SDL resources..." << std::endl;
 
-        if(texture) SDL_DestroyTexture(texture);
-        if(renderer) SDL_DestroyRenderer(renderer);
-        if(window) SDL_DestroyWindow(window);
-        if(surface) SDL_FreeSurface(surface);
+        if (texture)
+            SDL_DestroyTexture(texture);
+        if (renderer)
+            SDL_DestroyRenderer(renderer);
+        if (window)
+            SDL_DestroyWindow(window);
+        if (surface)
+            SDL_FreeSurface(surface);
 
         SDL_Quit();
     }
@@ -37,7 +40,7 @@ public:
         return height;
     }
 
-    SDL_Rect& Get_rect()
+    SDL_Rect &Get_rect()
     {
         return rect;
     }
@@ -47,22 +50,22 @@ public:
         return running;
     }
 
-    SDL_Window* Get_window()
+    SDL_Window *Get_window()
     {
         return window;
     }
 
-    SDL_Renderer* Get_renderer()
+    SDL_Renderer *Get_renderer()
     {
         return renderer;
     }
 
-    SDL_Surface* Get_surface()
+    SDL_Surface *Get_surface()
     {
         return surface;
     }
 
-    SDL_Texture* Get_texture()
+    SDL_Texture *Get_texture()
     {
         return texture;
     }
@@ -89,22 +92,22 @@ public:
         this->running = running;
     }
 
-    void Set_window(SDL_Window* window)
+    void Set_window(SDL_Window *window)
     {
         this->window = window;
     }
 
-    void Set_renderer(SDL_Renderer* renderer)
+    void Set_renderer(SDL_Renderer *renderer)
     {
         this->renderer = renderer;
     }
 
-    void Set_surface(SDL_Surface* surface)
+    void Set_surface(SDL_Surface *surface)
     {
         this->surface = surface;
     }
 
-    void Set_texture(SDL_Texture* texture)
+    void Set_texture(SDL_Texture *texture)
     {
         this->texture = texture;
     }
@@ -125,8 +128,7 @@ public:
             SDL_WINDOWPOS_CENTERED,
             width,
             height,
-            SDL_WINDOW_SHOWN
-        );
+            SDL_WINDOW_SHOWN);
 
         if (!window)
         {
@@ -175,7 +177,6 @@ public:
     }
 
 private:
-
     int width;
     int height;
 
@@ -183,8 +184,8 @@ private:
 
     bool running;
 
-    SDL_Window* window = nullptr;
-    SDL_Renderer* renderer = nullptr;
-    SDL_Surface* surface = nullptr;
-    SDL_Texture* texture = nullptr;
+    SDL_Window *window = nullptr;
+    SDL_Renderer *renderer = nullptr;
+    SDL_Surface *surface = nullptr;
+    SDL_Texture *texture = nullptr;
 };

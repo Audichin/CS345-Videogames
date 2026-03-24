@@ -10,7 +10,8 @@
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
-class Phyphox{
+class Phyphox
+{
 public:
     struct IMUData
     {
@@ -25,15 +26,15 @@ public:
         int wait;
     };
 
-    Phyphox(std::string ip) 
-    : BaseURL("http://" + ip + "/get"), 
-    prevDirect(0.0), 
-    prevYaw(0.0), 
-    prevPitch(0.0), 
-    prevRoll(0.0), 
-    prevAttT(0.0),
-    pause(0), 
-    wait(0)
+    Phyphox(std::string ip)
+        : BaseURL("http://" + ip + "/get"),
+          prevDirect(0.0),
+          prevYaw(0.0),
+          prevPitch(0.0),
+          prevRoll(0.0),
+          prevAttT(0.0),
+          pause(0),
+          wait(0)
     {
         curl = curl_easy_init();
     }
@@ -47,7 +48,7 @@ public:
         }
     }
 
-        std::string Get_BaseURL()
+    std::string Get_BaseURL()
     {
         return BaseURL;
     }
@@ -122,7 +123,8 @@ public:
 
         CURLcode res = curl_easy_perform(curl);
 
-        if (res == CURLE_OK){
+        if (res == CURLE_OK)
+        {
             data.wait = 0;
             data = JSON(recieve);
 
@@ -132,7 +134,7 @@ public:
             prevRoll = data.roll;
             prevAttT = data.attT;
         }
-        else 
+        else
         {
             if (data.wait == 3)
             {
@@ -140,12 +142,12 @@ public:
                 data.err = 1;
                 return data; // temp for now, hope to reset makeURL to base state and allow game to continue after fixing connection
             }
-            if (res != CURLE_OK) 
+            if (res != CURLE_OK)
             {
                 std::cout << "[WARN 1]: Curl cannot find connection" << std::endl;
                 data.wait += 1;
                 return data;
-            } 
+            }
         }
         return data;
     }
@@ -164,8 +166,6 @@ public:
         curl_easy_perform(curl);
     }
 
-
-
 private:
     CURL *curl;
     std::string BaseURL;
@@ -180,31 +180,30 @@ private:
 
     float rounded(float value)
     {
-        return(std::round(value * 10000.0) / 10000.0);
+        return (std::round(value * 10000.0) / 10000.0);
     }
 
-    static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) 
+    static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
     {
         size_t totalSize = size * nmemb;
-        std::string* str = static_cast<std::string*>(userp);
-        str->append(static_cast<char*>(contents), totalSize);
+        std::string *str = static_cast<std::string *>(userp);
+        str->append(static_cast<char *>(contents), totalSize);
         return totalSize;
     }
 
     std::string makeURL()
     {
         return BaseURL + "?direct=" + std::to_string(prevDirect) + "|attT" +
-                         "&attT=" + std::to_string(prevAttT) +
-                         "&yaw=" + std::to_string(prevYaw) + "|attT" +
-                         "&pitch=" + std::to_string(prevPitch) + "|attT" +
-                         "&roll=" + std::to_string(prevRoll) + "|attT";
-
+               "&attT=" + std::to_string(prevAttT) +
+               "&yaw=" + std::to_string(prevYaw) + "|attT" +
+               "&pitch=" + std::to_string(prevPitch) + "|attT" +
+               "&roll=" + std::to_string(prevRoll) + "|attT";
     }
 
     IMUData JSON(std::string response)
     {
         json j = json::parse(response);
-        auto& buffer = j["buffer"];
+        auto &buffer = j["buffer"];
         bool measuring;
         IMUData data{};
 
@@ -216,7 +215,7 @@ private:
                 data.measuring = j["status"]["measuring"];
                 if (measuring == true)
                 {
-                    if (buffer.contains("direct")) 
+                    if (buffer.contains("direct"))
                     {
                         auto direct = buffer["direct"]["buffer"];
                         if (!direct.empty())
@@ -224,10 +223,10 @@ private:
                             data.direct = rounded(static_cast<float>(direct.back()));
                         }
                         std::cout << "Direct  | "
-                              << data.direct << std::endl;
+                                  << data.direct << std::endl;
                     }
 
-                    if (buffer.contains("attT")) 
+                    if (buffer.contains("attT"))
                     {
                         auto attT = buffer["attT"]["buffer"];
                         if (!attT.empty())
@@ -235,11 +234,11 @@ private:
                             data.attT = rounded(static_cast<float>(attT.back()));
                         }
                         std::cout << "Timestamp | "
-                              << data.yaw << ", "
-                              << data.pitch << ", "
-                              << data.roll << std::endl; 
+                                  << data.yaw << ", "
+                                  << data.pitch << ", "
+                                  << data.roll << std::endl;
                     }
-                if (buffer.contains("pitch")) 
+                    if (buffer.contains("pitch"))
                     {
                         auto pitch = buffer["pitch"]["buffer"];
                         if (!pitch.empty())
@@ -247,9 +246,9 @@ private:
                             data.pitch = rounded(static_cast<float>(pitch.back()));
                         }
                         std::cout << "Pitch  | "
-                              << data.pitch << std::endl; 
+                                  << data.pitch << std::endl;
                     }
-                if (buffer.contains("roll")) 
+                    if (buffer.contains("roll"))
                     {
                         auto roll = buffer["roll"]["buffer"];
                         if (!roll.empty())
@@ -257,9 +256,9 @@ private:
                             data.roll = rounded(static_cast<float>(roll.back()));
                         }
                         std::cout << "Roll  | "
-                              << data.roll << std::endl; 
+                                  << data.roll << std::endl;
                     }
-                if (buffer.contains("yaw")) 
+                    if (buffer.contains("yaw"))
                     {
                         auto yaw = buffer["yaw"]["buffer"];
                         if (!yaw.empty())
@@ -267,12 +266,12 @@ private:
                             data.yaw = rounded(static_cast<float>(yaw.back()));
                         }
                         std::cout << "Yaw  | "
-                              << data.yaw << std::endl; 
+                                  << data.yaw << std::endl;
                     }
                 }
                 else
                 {
-                    throw 2; 
+                    throw 2;
                 }
             }
             else
@@ -280,7 +279,7 @@ private:
                 throw 1;
             }
         }
-        catch(int err)
+        catch (int err)
         {
             if (err == 1)
             {
@@ -289,12 +288,10 @@ private:
             }
             if (err == 2)
             {
-                std::cout << "[WARN 3]: No data from Phyphox, unpause Phyphox on phone..." << std::endl;   
+                std::cout << "[WARN 3]: No data from Phyphox, unpause Phyphox on phone..." << std::endl;
                 data.warn = true;
             }
         }
         return data;
     }
-
-
-};  
+};
