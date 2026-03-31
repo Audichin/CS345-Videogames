@@ -1,23 +1,18 @@
 #include <iostream>
-#include <SDL2/SDL.h>
-#include <vector>
-#include <curl/curl.h>
-#include <nlohmann/json.hpp>
+#include <SDL.h>
 
-#include "phyphox.h"
-#include "gamewindow.h"
-
-void check_bounds(Gamewindow &game, int screen_width, int screen_height);
-void center(Gamewindow &game, int screen_width, int screen_height);
+#include "gamewindow.hpp"
+#include "phyphox.hpp"
 
 int main(int argc, char *argv[])
 {
     std::string ip;
-    Phyphox::IMUData movement;
+    Phyphox::IMUData movement{};
     SDL_Event event;
     Gamewindow game;
     int clear_counter = 0;
     static int frame = 0;
+    float previousDirect = 0.0f; 
 
     if (game.boot() == 1)
     {
@@ -38,8 +33,6 @@ int main(int argc, char *argv[])
     Phyphox poller(ip);
     std::cout << "Starting poll...\n";
 
-    center(game, game.Get_width(), game.Get_height());
-
     while (game.Get_running())
     { // constantly runs
         while (SDL_PollEvent(&event) != 0)
@@ -48,10 +41,11 @@ int main(int argc, char *argv[])
             {
                 game.Set_running(false); // when quit event happens, stop the game
             }
+            if (event.type == SDL_KEYDOWN && game.Get_player() != nullptr)
+            {
+                game.Get_player()->keyEvent(event.key.keysym.sym);
+            }
         }
-        SDL_RenderClear(game.Get_renderer());                                            // clears the renderer to be redrawn on the window
-        SDL_RenderCopy(game.Get_renderer(), game.Get_texture(), NULL, &game.Get_rect()); // copies the texture to the renderer to be drawn on the window
-        SDL_SetRenderDrawColor(game.Get_renderer(), 0, 0, 0, 255);                       // colors the window black (0,0,0) no transparacy (255)
 
         // LIST OF THINGS TO ADD HERE FOR FUTURE:
         // 1) If a data point is 0, just assume 0 change
@@ -81,18 +75,20 @@ int main(int argc, char *argv[])
         }
         else
         {
-            game.Set_rect({game.Get_rect().x + static_cast<int>(movement.direct / 3.50 - poller.Get_prevDirect() / 3.50),
-                           game.Get_rect().y + static_cast<int>(movement.pitch), game.Get_rect().w, game.Get_rect().h});
+            game.Get_player()->translate(
+                static_cast<int>((movement.direct - previousDirect) / 3.50f),
+                static_cast<int>(movement.pitch));
+            previousDirect = movement.direct;
         }
 
-        check_bounds(game, game.Get_width(), game.Get_height());
+        game.Wrap_player_within_bounds();
 
-        std::cout << "X: " << game.Get_rect().x << " | Y: " << game.Get_rect().y << std::endl;
+        if (game.Get_player() != nullptr)
+        {
+            std::cout << "X: " << game.Get_player()->getX() << " | Y: " << game.Get_player()->getY() << std::endl;
+        }
 
-        // SDL_SetRenderDrawColor(game.Get_renderer(), 255, 0, 0, 255); //sets color to red (255,0,0), no transparacy (255)
-        // SDL_RenderFillRect(game.Get_renderer(), &game.Get_rect()); //creates rect using renderer and shape dimensions
-
-        SDL_RenderPresent(game.Get_renderer()); // update screen
+        game.Draw();
 
         SDL_Delay(1000 / 60); // sets a frame limit of 60fps
 
@@ -103,30 +99,4 @@ int main(int argc, char *argv[])
     }
 
     return 0;
-}
-
-void check_bounds(Gamewindow &game, int screen_width, int screen_height)
-{
-    if (game.Get_rect().x > screen_width)
-    {
-        game.Set_rect({25, game.Get_rect().y, game.Get_rect().w, game.Get_rect().h});
-    }
-    if (game.Get_rect().y > screen_height)
-    {
-        game.Set_rect({game.Get_rect().x, 25, game.Get_rect().w, game.Get_rect().h});
-    }
-    if (game.Get_rect().x < 0)
-    {
-        game.Set_rect({screen_width - 25, game.Get_rect().y, game.Get_rect().w, game.Get_rect().h});
-    }
-    if (game.Get_rect().y < 0)
-    {
-        game.Set_rect({game.Get_rect().x, screen_height - 25, game.Get_rect().w, game.Get_rect().h});
-    }
-}
-
-void center(Gamewindow &game, int screen_width, int screen_height)
-{
-    game.Set_rect({(screen_width / 2) - (game.Get_rect().w / 2),
-                   (screen_height / 2) - (game.Get_rect().h / 2), game.Get_rect().w, game.Get_rect().h});
 }
