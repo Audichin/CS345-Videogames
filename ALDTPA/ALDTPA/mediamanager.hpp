@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <map>
 #include <string>
 #include <vector>
@@ -11,24 +12,17 @@ class MediaManager
 public:
     SDL_Texture *read(SDL_Renderer *renderer, const std::string &fname, int &w, int &h)
     {
+        ensureAssetIndex();
+
         if (images.find(fname) == images.end())
         {
-            const std::vector<std::string> candidatePaths = {
-                fname,
-                "./" + fname,
-                "./resources/images/" + fname,
-                "ALDTPA/ALDTPA/" + fname};
-
-            SDL_Surface *character = nullptr;
-            for (const std::string &path : candidatePaths)
+            auto asset = imagePaths.find(fname);
+            if (asset == imagePaths.end())
             {
-                character = SDL_LoadBMP(path.c_str());
-                if (character != nullptr)
-                {
-                    break;
-                }
+                throw "Could not find requested image in Assets folder";
             }
 
+            SDL_Surface *character = SDL_LoadBMP(asset->second.c_str());
             if (character == nullptr)
             {
                 throw "Could not read image.bmp file";
@@ -60,7 +54,46 @@ public:
     }
 
 private:
+    void ensureAssetIndex()
+    {
+        if (assetsIndexed)
+        {
+            return;
+        }
+
+        assetsIndexed = true;
+
+        const std::vector<std::filesystem::path> assetRoots = {
+            std::filesystem::path("../Assets"),
+            std::filesystem::path("./Assets"),
+            std::filesystem::path("ALDTPA/Assets")};
+
+        for (const auto &root : assetRoots)
+        {
+            if (!std::filesystem::exists(root) || !std::filesystem::is_directory(root))
+            {
+                continue;
+            }
+
+            for (const auto &entry : std::filesystem::recursive_directory_iterator(root))
+            {
+                if (!entry.is_regular_file())
+                {
+                    continue;
+                }
+
+                const auto extension = entry.path().extension().string();
+                if (extension == ".bmp" || extension == ".BMP")
+                {
+                    imagePaths.try_emplace(entry.path().filename().string(), entry.path().string());
+                }
+            }
+        }
+    }
+
+    bool assetsIndexed = false;
     std::map<std::string, SDL_Texture *> images;
+    std::map<std::string, std::string> imagePaths;
 };
 
 inline MediaManager mm;

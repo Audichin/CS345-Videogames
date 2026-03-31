@@ -117,6 +117,7 @@ public:
         try
         {
             player = std::make_unique<Character>(renderer, 1, "character_main", ".bmp");
+            player->scaleToFit(96, 96);
         }
         catch (const char *message)
         {
