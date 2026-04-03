@@ -5,16 +5,13 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "C:/msys64/mingw64/include",
-                "C:/msys64/mingw64/include/SDL2",
-                "C:/msys64/mingw64/include/SDL2/SDL_mixer"
+                "C:/msys64/mingw64/include/SDL2"
             ],
-            "compilerPath": "C:/mingw64/bin/gcc.exe",
+            "compilerPath": "C:/msys64/mingw64/bin/g++.exe",
             "cStandard": "${default}",
-            "cppStandard": "${default}",
+            "cppStandard": "c++17",
             "intelliSenseMode": "windows-gcc-x64",
-            "compilerArgs": [
-                ""
-            ]
+            "compilerArgs": []
         }
     ],
     "version": 4

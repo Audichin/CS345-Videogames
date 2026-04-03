@@ -17,9 +17,8 @@ int main(int argc, char *argv[])
     Gamewindow game;
     int clear_counter = 0;
     static int frame = 0;
-    float previousDirect = 0.0f; 
-    bool collide=false;
-    vector<*Block> objectsList;
+    bool collide = false;
+    std::vector<Block *> objectsList;
 
 
     if (game.boot() == 1)
@@ -52,7 +51,6 @@ int main(int argc, char *argv[])
     while (game.Get_running())
     { // constantly runs
 
-        
         while (SDL_PollEvent(&event) != 0)
         {
             if (event.type == SDL_QUIT)
@@ -85,9 +83,19 @@ int main(int argc, char *argv[])
         }
 
         //loop for collision and object drawing
-        for object in objectsList{
-            object.draw();
-            if object.collide(game.Get_player()){collide = true;}
+        collide = false;
+        for (Block *object : objectsList)
+        {
+            if (object == nullptr)
+            {
+                continue;
+            }
+
+            object->draw(game.Get_renderer());
+            if (object->collided(game.Get_player()))
+            {
+                collide = true;
+            }
         }
 
         if (movement.warn == true || collide)
@@ -102,7 +110,6 @@ int main(int argc, char *argv[])
             game.Get_player()->translate(
                 static_cast<int>((movement.pitch)),
                 static_cast<int>(movement.yaw));
-            previousDirect = movement.direct;
         }
 
         game.Wrap_player_within_bounds();
