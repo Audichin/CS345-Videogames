@@ -3,8 +3,8 @@
 #include <iostream>
 #include <memory>
 #include <stdexcept>
-
 #include <SDL.h>
+#include <SDL_mixer.h>
 
 #include "character.hpp"
 
@@ -116,7 +116,7 @@ public:
 
         try
         {
-            player = std::make_unique<Character>(renderer, 1, "character_main", ".bmp");
+            player = std::make_unique<Character>(renderer, 1, "chinchilla", ".bmp");
             player->scaleToFit(96, 96);
         }
         catch (const char *message)
@@ -141,6 +141,18 @@ public:
         }
 
         Center_player();
+
+        music = Mix_LoadMUS("Javomatics.mp3");
+        if (!music)
+        {
+            throw "[WARN]: Could not find music file\n";
+        }
+        effect = Mix_LoadWAV("Stageclear.wav");
+        
+        if(!effect)
+        {
+            throw "[WARN]: Could not find effect file\n";
+        }
         return 0;
     }
 
@@ -208,5 +220,7 @@ private:
 
     SDL_Window *window = nullptr;
     SDL_Renderer *renderer = nullptr;
+    Mix_Music *music;
+    Mix_Chunk *effect;
     std::unique_ptr<Character> player;
 };

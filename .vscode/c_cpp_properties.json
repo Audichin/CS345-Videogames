@@ -4,10 +4,9 @@
             "name": "windows-gcc-x64",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:/Users/glimp/vcpkg/installed/x64-windows/include/SDL2",
-                "C:/Users/glimp/vcpkg/installed/x64-mingw-dynamic/include",
-                "C:/Users/glimp/vcpkg/installed/x64-windows/include",
-                "C:/Users/glimp/vcpkg/installed/x64-mingw-static/include"
+                "C:/msys64/mingw64/include",
+                "C:/msys64/mingw64/include/SDL2",
+                "C:/msys64/mingw64/include/SDL2/SDL_mixer"
             ],
             "compilerPath": "C:/mingw64/bin/gcc.exe",
             "cStandard": "${default}",
