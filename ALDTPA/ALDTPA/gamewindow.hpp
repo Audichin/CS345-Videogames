@@ -166,8 +166,12 @@ public:
         {
             std::cerr << "[WARN]: Could not find music file: " << Mix_GetError() << std::endl;
         }
-        effect = Mix_LoadWAV("../Sounds/Stageclear.wav");
+        else
+        {
+            Mix_PlayMusic(music, -1);
+        }
         
+        effect = Mix_LoadWAV("../Sounds/Stageclear.wav");
         if(!effect)
         {
             std::cerr << "[WARN]: Could not find effect file: " << Mix_GetError() << std::endl;

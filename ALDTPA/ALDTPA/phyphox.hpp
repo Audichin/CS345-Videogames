@@ -142,7 +142,8 @@ public:
 
             if (wait >= 3)
             {
-                std::cout << "[ERR]: Lost connection to phone, please check connection and reset phone graphs..." << std::endl;
+                std::cout << "[WARN 1]: Curl cannot find connection (3/3) " << std::endl;
+                std::cout << "[ERR]: Lost connection to phone, closing game..." << std::endl;
                 data.err = 1;
                 return data;
             }
@@ -223,8 +224,8 @@ private:
                         {
                             data.direct = rounded(static_cast<float>(direct.back()));
                         }
-                        std::cout << "Direct  | "
-                                  << data.direct << std::endl;
+                        // std::cout << "Direct  | "
+                        //           << data.direct << std::endl;
                     }
 
                     if (buffer.contains("attT"))
@@ -234,10 +235,10 @@ private:
                         {
                             data.attT = rounded(static_cast<float>(attT.back()));
                         }
-                        std::cout << "Timestamp | "
-                                  << data.yaw << ", "
-                                  << data.pitch << ", "
-                                  << data.roll << std::endl;
+                        // std::cout << "Timestamp | "
+                        //           << data.yaw << ", "
+                        //           << data.pitch << ", "
+                        //           << data.roll << std::endl;
                     }
                     if (buffer.contains("pitch"))
                     {
@@ -246,8 +247,8 @@ private:
                         {
                             data.pitch = rounded(static_cast<float>(pitch.back()));
                         }
-                        std::cout << "Pitch  | "
-                                  << data.pitch << std::endl;
+                        // std::cout << "Pitch  | "
+                        //           << data.pitch << std::endl;
                     }
                     if (buffer.contains("roll"))
                     {
@@ -256,8 +257,8 @@ private:
                         {
                             data.roll = rounded(static_cast<float>(roll.back()));
                         }
-                        std::cout << "Roll  | "
-                                  << data.roll << std::endl;
+                        // std::cout << "Roll  | "
+                        //           << data.roll << std::endl;
                     }
                     if (buffer.contains("yaw"))
                     {
@@ -266,8 +267,8 @@ private:
                         {
                             data.yaw = rounded(static_cast<float>(yaw.back()));
                         }
-                        std::cout << "Yaw  | "
-                                  << data.yaw << std::endl;
+                            // std::cout << "Yaw  | "
+                            //         << data.yaw << std::endl;
                     }
                 }
                 else

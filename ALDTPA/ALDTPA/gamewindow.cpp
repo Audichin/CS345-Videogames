@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     SDL_Event event;
     Gamewindow game;
     int clear_counter = 0;
-    static int frame = 0;
+    // static int frame = 0;
     bool collide = false;
     std::vector<Block *> objectsList;
     int previousPlayerX = 0;
@@ -64,7 +64,6 @@ int main(int argc, char *argv[])
         previousPlayerY = game.Get_player()->getY();
     }
 
-
     while (game.Get_running())
     { // constantly runs
         while (SDL_PollEvent(&event) != 0)
@@ -83,14 +82,14 @@ int main(int argc, char *argv[])
         // 1) If a data point is 0, just assume 0 change
         // 2) Find out how to use phone movement to change position
         // 3) Add a way to change sensitivity
+        movement = poller.Phyphox_loop();
+        // if (frame % 3 == 0)
+        // {
+            
+        // }
 
-        if (frame % 6 == 0)
-        {
-            movement = poller.Phyphox_loop();
-        }
-
-        frame++;
-        clear_counter++;
+        // frame++;
+        // clear_counter++;
 
         if (clear_counter > 600) // about 10 seconds at 60 FPS
         {
