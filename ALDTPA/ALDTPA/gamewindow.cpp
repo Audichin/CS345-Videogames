@@ -51,6 +51,8 @@ int main(int argc, char *argv[])
 
     while (game.Get_running())
     { // constantly runs
+
+        
         while (SDL_PollEvent(&event) != 0)
         {
             if (event.type == SDL_QUIT)
