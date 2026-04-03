@@ -44,8 +44,9 @@ int main(int argc, char *argv[])
     //can be moved anywhere, should only be ran to change current level
     //Only run once not in a loop
     //make sure to clear objectsList before reuse
+    std::cout << "Before text object" << std::endl;
     TextToObjects(objectsList, game.Get_renderer() /*,"Filename.txt"*/ );
-
+    std::cout << "After text object" << std::endl;
 
 
     while (game.Get_running())
