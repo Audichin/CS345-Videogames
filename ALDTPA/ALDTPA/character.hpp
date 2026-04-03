@@ -114,33 +114,38 @@ public:
     }
 };
 
-class Block :public Sprite{
-    protected:
+class Block : public Sprite
+{
+protected:
     bool moveable;//FUTURE CONTENT:: could be use in combination with collide to move block
     bool solid;
 
-    public:
+public:
     Block(SDL_Renderer *renderer, int count = 1, const std::string &fname = "image", const std::string &exten = ".bmp",
-                int newX = 0, int newY = 0,bool newSolid=false, bool newMoveable =false)
-            : Sprite(renderer, count, fname, exten, newX, newY){}
+          int newX = 0, int newY = 0, bool newSolid = false, bool newMoveable = false)
+        : Sprite(renderer, count, fname, exten, newX, newY),
+          moveable(newMoveable),
+          solid(newSolid) {}
     
     void setPosition(int newX, int newY)
     {
-        px = static_cast<float>(newX);
-        py = static_cast<float>(newY);
         Sprite::setPosition(newX, newY);
     }
 
     bool collided(Sprite *other) const
     {
-        if solid return false;
-        return inside(other->dst.x, other->dst.y) ||
-               inside(other->dst.x + other->dst.w, other->dst.y) ||
-               inside(other->dst.x, other->dst.y + other->dst.h) ||
-               inside(other->dst.x + other->dst.w, other->dst.y + other->dst.h);
-    }
-            
+        if (!solid || other == nullptr)
+        {
+            return false;
+        }
 
+        // return inside(other->dst.x, other->dst.y) ||
+        //        inside(other->dst.x + other->dst.w, other->dst.y) ||
+        //        inside(other->dst.x, other->dst.y + other->dst.h) ||
+        //        inside(other->dst.x + other->dst.w, other->dst.y + other->dst.h);
+        
+        return Sprite::collided(other);
+    }
 };
 
 class Character : public Sprite
@@ -159,7 +164,7 @@ class Character : public Sprite
             vy(newVy),
             ax(newAx),
             ay(newAy)
-    {
+        {
     }
 
     void update(float dt) override

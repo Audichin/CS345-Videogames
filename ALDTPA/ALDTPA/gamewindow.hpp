@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+
 #include <SDL.h>
 #include <SDL_mixer.h>
 
@@ -22,6 +23,17 @@ public:
         std::cout << "[NOTICE]: Destructor called, cleaning SDL resources..." << std::endl;
 
         player.reset();
+
+        if (effect)
+        {
+            Mix_FreeChunk(effect);
+        }
+        if (music)
+        {
+            Mix_FreeMusic(music);
+        }
+        Mix_CloseAudio();
+        Mix_Quit();
 
         if (renderer)
         {
@@ -142,16 +154,22 @@ public:
 
         Center_player();
 
-        music = Mix_LoadMUS("Javomatics.mp3");
+        if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+        {
+            std::cerr << "[WARN]: SDL_mixer could not initialize audio: " << Mix_GetError() << std::endl;
+            return 0;
+        }
+
+        music = Mix_LoadMUS("../Sounds/Javomatics.mp3");
         if (!music)
         {
-            throw "[WARN]: Could not find music file\n";
+            std::cerr << "[WARN]: Could not find music file: " << Mix_GetError() << std::endl;
         }
-        effect = Mix_LoadWAV("Stageclear.wav");
+        effect = Mix_LoadWAV("../Sounds/Stageclear.wav");
         
         if(!effect)
         {
-            throw "[WARN]: Could not find effect file\n";
+            std::cerr << "[WARN]: Could not find effect file: " << Mix_GetError() << std::endl;
         }
         return 0;
     }
@@ -220,7 +238,7 @@ private:
 
     SDL_Window *window = nullptr;
     SDL_Renderer *renderer = nullptr;
-    Mix_Music *music;
-    Mix_Chunk *effect;
+    Mix_Music *music = nullptr;
+    Mix_Chunk *effect = nullptr;
     std::unique_ptr<Character> player;
 };
