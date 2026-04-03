@@ -90,8 +90,8 @@ int main(int argc, char *argv[])
         else
         {
             game.Get_player()->translate(
-                static_cast<int>((movement.direct - previousDirect) / 3.50f),
-                static_cast<int>(movement.pitch));
+                static_cast<int>((movement.pitch)),
+                static_cast<int>(movement.yaw));
             previousDirect = movement.direct;
         }
 
