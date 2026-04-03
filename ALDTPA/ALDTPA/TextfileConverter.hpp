@@ -23,15 +23,16 @@ void TextToObjects(vector<*Block> objectList,SDL_Renderer *renderer, string file
     bool collide=false;
     int currX=0;
     int currY=0;
+    cout<<"================================"<<endl;
     while(getline(myFile,line)){
         for index in line{
-            if (index == 1) {currImg = "wood"; collide = true;}
-            else if (index == 2) {currImg = "tile"; collide = false;}
-            else if (index == 3) {currImg = "white_brick"; collide = false;}
-            else if (index == 4) {currImg = "brick"; collide = true;}
+            if (index == 1) {currImg = "Assets/wood"; collide = true;}
+            else if (index == 2) {currImg = "Assets/tile"; collide = false;}
+            else if (index == 3) {currImg = "Assets/white_brick"; collide = false;}
+            else if (index == 4) {currImg = "Assets/brick"; collide = true;}
             else {currImg = "chinchilla"; collide=false;}
             currX+=32;
-            
+            cout<<currImg<<endl;
 
             objectList.push_back(new Block(render,1,currImg,"bmp",currX,currY,collide));
         }

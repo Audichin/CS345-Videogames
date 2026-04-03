@@ -134,10 +134,7 @@ class Block :public Sprite{
     bool collided(Sprite *other) const
     {
         if solid return false;
-        return inside(other->dst.x, other->dst.y) ||
-               inside(other->dst.x + other->dst.w, other->dst.y) ||
-               inside(other->dst.x, other->dst.y + other->dst.h) ||
-               inside(other->dst.x + other->dst.w, other->dst.y + other->dst.h);
+        return Sprite::collided(other);
     }
             
 
