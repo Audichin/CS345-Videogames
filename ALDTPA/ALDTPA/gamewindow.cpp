@@ -45,13 +45,20 @@ int main(int argc, char *argv[])
     //Only run once not in a loop
     //make sure to clear objectsList before reuse
     std::cout << "Before text object" << std::endl;
-    TextToObjects(objectsList, game.Get_renderer() /*,"Filename.txt"*/ );
+    try
+    {
+        TextToObjects(objectsList, game.Get_renderer() /*,"Filename.txt"*/);
+    }
+    catch (const std::exception &ex)
+    {
+        std::cerr << "[ERR]: " << ex.what() << std::endl;
+        game.Set_running(false);
+    }
     std::cout << "After text object" << std::endl;
 
 
     while (game.Get_running())
     { // constantly runs
-
         while (SDL_PollEvent(&event) != 0)
         {
             if (event.type == SDL_QUIT)
@@ -87,6 +94,7 @@ int main(int argc, char *argv[])
         collide = false;
         for (Block *object : objectsList)
         {
+            
             if (object == nullptr)
             {
                 continue;
@@ -95,6 +103,7 @@ int main(int argc, char *argv[])
             object->draw(game.Get_renderer());
             if (object->collided(game.Get_player()))
             {
+                std::cout << "Collision detected with object at (" << object->getX() << ", " << object->getY() << ")" << std::endl;
                 collide = true;
             }
         }

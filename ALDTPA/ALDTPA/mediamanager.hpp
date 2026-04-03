@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <map>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -14,33 +15,54 @@ public:
     {
         ensureAssetIndex();
 
-        if (images.find(fname) == images.end())
+        const std::filesystem::path requestedPath(fname);
+        const std::string filename = requestedPath.filename().string();
+        const std::string cacheKey = filename.empty() ? fname : filename;
+
+        auto cached = images.find(cacheKey);
+        if (cached != images.end())
         {
-            auto asset = imagePaths.find(fname);
-            if (asset == imagePaths.end())
-            {
-                throw "Could not find requested image in Assets folder";
-            }
-
-            SDL_Surface *character = SDL_LoadBMP(asset->second.c_str());
-            if (character == nullptr)
-            {
-                throw "Could not read image.bmp file";
-            }
-            SDL_SetColorKey(character,SDL_TRUE,SDL_MapRGB(character->format,255,0,255));
-            SDL_SetColorKey(character, SDL_TRUE, SDL_MapRGB(character->format, 173, 54, 58));
-            SDL_Texture *charText = SDL_CreateTextureFromSurface(renderer, character);
-            SDL_FreeSurface(character);
-
-            if (charText == nullptr)
-            {
-                throw "Failed to create texture";
-            }
-
-            images[fname] = charText;
+            SDL_QueryTexture(cached->second, nullptr, nullptr, &w, &h);
+            return cached->second;
         }
 
-        SDL_Texture *result = images[fname];
+        std::filesystem::path resolvedPath;
+        if (std::filesystem::exists(requestedPath))
+        {
+            resolvedPath = std::filesystem::absolute(requestedPath);
+        }
+        else
+        {
+            auto asset = imagePaths.find(cacheKey);
+            if (asset == imagePaths.end())
+            {
+                throw std::runtime_error("Could not find requested image in Assets folder: " + fname);
+            }
+            resolvedPath = asset->second;
+        }
+
+        const std::string normalizedPath = resolvedPath.make_preferred().string();
+
+        SDL_Surface *character = SDL_LoadBMP(normalizedPath.c_str());
+        if (character == nullptr)
+        {
+            throw std::runtime_error("Could not read .bmp file: " + normalizedPath);
+        }
+
+        SDL_SetColorKey(character, SDL_TRUE, SDL_MapRGB(character->format, 255, 0, 255));
+        SDL_SetColorKey(character, SDL_TRUE, SDL_MapRGB(character->format, 173, 54, 58));
+
+        SDL_Texture *charText = SDL_CreateTextureFromSurface(renderer, character);
+        SDL_FreeSurface(character);
+
+        if (charText == nullptr)
+        {
+            throw std::runtime_error("Failed to create texture from: " + normalizedPath);
+        }
+
+        images[cacheKey] = charText;
+
+        SDL_Texture *result = charText;
         SDL_QueryTexture(result, nullptr, nullptr, &w, &h);
         return result;
     }
@@ -64,6 +86,7 @@ private:
         assetsIndexed = true;
 
         const std::vector<std::filesystem::path> assetRoots = {
+            std::filesystem::path(__FILE__).parent_path().parent_path() / "Assets",
             std::filesystem::path("../Assets"),
             std::filesystem::path("./Assets"),
             std::filesystem::path("ALDTPA/Assets")};
@@ -85,7 +108,9 @@ private:
                 const auto extension = entry.path().extension().string();
                 if (extension == ".bmp" || extension == ".BMP")
                 {
-                    imagePaths.try_emplace(entry.path().filename().string(), entry.path().string());
+                    imagePaths.try_emplace(
+                        entry.path().filename().string(),
+                        std::filesystem::absolute(entry.path()));
                 }
             }
         }
@@ -93,7 +118,7 @@ private:
 
     bool assetsIndexed = false;
     std::map<std::string, SDL_Texture *> images;
-    std::map<std::string, std::string> imagePaths;
+    std::map<std::string, std::filesystem::path> imagePaths;
 };
 
 inline MediaManager mm;

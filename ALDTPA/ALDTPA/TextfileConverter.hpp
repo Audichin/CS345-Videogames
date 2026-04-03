@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "character.hpp"
+
 /*
 wood 1
 tile 2

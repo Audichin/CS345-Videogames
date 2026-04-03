@@ -83,8 +83,13 @@ public:
     }
     void draw(SDL_Renderer *renderer, int offsetx = 0, int offsety = 0)
     {
+        std::cout << "Drawing sprite at (" << dst.x + offsetx << ", " << dst.y + offsety << ")" << std::endl;
         if (dead)
+        {
+            std::cout << "Sprite is dead, not drawing." << std::endl;
             return;
+        }
+        
         if (textures.empty() || textures[which] == NULL)
             throw "About to render a null texture";
         SDL_Rect finalDst = dst;
@@ -116,6 +121,7 @@ public:
 
 class Block : public Sprite
 {
+
 protected:
     bool moveable;//FUTURE CONTENT:: could be use in combination with collide to move block
     bool solid;
