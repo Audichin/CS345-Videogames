@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+#include <vector>
 
 #include <SDL.h>
 #include <SDL_mixer.h>
@@ -178,6 +179,27 @@ public:
     {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
+
+        if (player)
+        {
+            player->draw(renderer);
+        }
+
+        SDL_RenderPresent(renderer);
+    }
+
+    void Draw(const std::vector<Block *> &objects)
+    {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        for (Block *object : objects)
+        {
+            if (object != nullptr)
+            {
+                object->draw(renderer);
+            }
+        }
 
         if (player)
         {

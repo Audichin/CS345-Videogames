@@ -125,6 +125,7 @@ public:
 
         if (res == CURLE_OK)
         {
+            wait = 0;
             data.wait = 0;
             data = JSON(recieve);
 
@@ -136,18 +137,18 @@ public:
         }
         else
         {
-            if (data.wait == 3)
+            wait += 1;
+            data.wait = wait;
+
+            if (wait >= 3)
             {
                 std::cout << "[ERR]: Lost connection to phone, please check connection and reset phone graphs..." << std::endl;
                 data.err = 1;
-                return data; // temp for now, hope to reset makeURL to base state and allow game to continue after fixing connection
-            }
-            if (res != CURLE_OK)
-            {
-                std::cout << "[WARN 1]: Curl cannot find connection" << std::endl;
-                data.wait += 1;
                 return data;
             }
+
+            std::cout << "[WARN 1]: Curl cannot find connection (" << wait << "/3)" << std::endl;
+            return data;
         }
         return data;
     }

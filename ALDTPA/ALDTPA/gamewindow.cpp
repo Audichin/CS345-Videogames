@@ -19,6 +19,8 @@ int main(int argc, char *argv[])
     static int frame = 0;
     bool collide = false;
     std::vector<Block *> objectsList;
+    int previousPlayerX = 0;
+    int previousPlayerY = 0;
 
 
     if (game.boot() == 1)
@@ -56,6 +58,12 @@ int main(int argc, char *argv[])
     }
     std::cout << "After text object" << std::endl;
 
+    if (game.Get_player() != nullptr)
+    {
+        previousPlayerX = game.Get_player()->getX();
+        previousPlayerY = game.Get_player()->getY();
+    }
+
 
     while (game.Get_running())
     { // constantly runs
@@ -76,7 +84,7 @@ int main(int argc, char *argv[])
         // 2) Find out how to use phone movement to change position
         // 3) Add a way to change sensitivity
 
-        if (frame % 3 == 0)
+        if (frame % 6 == 0)
         {
             movement = poller.Phyphox_loop();
         }
@@ -90,56 +98,42 @@ int main(int argc, char *argv[])
             clear_counter = 0;
         }
 
-        //loop for collision and object drawing
+        if (movement.warn != true && game.Get_player() != nullptr)
+        {
+            previousPlayerX = game.Get_player()->getX();
+            previousPlayerY = game.Get_player()->getY();
+
+            game.Get_player()->translate(
+                static_cast<int>(movement.pitch),
+                static_cast<int>(movement.yaw));
+
+            game.Wrap_player_within_bounds();
+        }
+
+        // collision checks happen after movement so we can roll back to the last valid position
         collide = false;
         for (Block *object : objectsList)
         {
-            
-            if (object == nullptr)
+            if (object == nullptr || game.Get_player() == nullptr)
             {
                 continue;
             }
 
-            object->draw(game.Get_renderer());
             if (object->collided(game.Get_player()))
             {
                 std::cout << "Collision detected with object at (" << object->getX() << ", " << object->getY() << ")" << std::endl;
                 collide = true;
+                game.Get_player()->setPosition(previousPlayerX, previousPlayerY);
+                break;
             }
         }
-
-        if (movement.warn == true || collide)
-        {
-            movement.direct = poller.Get_prevDirect();
-            movement.yaw = poller.Get_prevYaw();
-            movement.pitch = poller.Get_prevPitch();
-            movement.roll = poller.Get_prevRoll();
-        }
-        else
-        {
-            game.Get_player()->translate(
-                static_cast<int>((movement.pitch)),
-                static_cast<int>(movement.yaw));
-        }
-
-        game.Wrap_player_within_bounds();
 
         if (game.Get_player() != nullptr)
         {
             std::cout << "X: " << game.Get_player()->getX() << " | Y: " << game.Get_player()->getY() << std::endl;
         }
 
-        game.Draw();
-        for (Block *object : objectsList)
-        {
-            
-            if (object == nullptr)
-            {
-                continue;
-            }
-
-            object->draw(game.Get_renderer());
-        }
+        game.Draw(objectsList);
 
         SDL_Delay(1000 / 60); // sets a frame limit of 60fps
 

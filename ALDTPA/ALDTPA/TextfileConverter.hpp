@@ -57,7 +57,9 @@ inline void TextToObjects(std::vector<Block *> &objectList, SDL_Renderer *render
                 collide = true;
             }
 
-            objectList.push_back(new Block(renderer, 1, currImg, ".bmp", currX, currY, collide));
+            Block *block = new Block(renderer, 1, currImg, ".bmp", currX, currY, collide);
+            block->setSize(32, 32);
+            objectList.push_back(block);
             currX += 32;
         }
 
