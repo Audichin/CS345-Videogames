@@ -4,8 +4,12 @@
 #include "gamewindow.hpp"
 #include "phyphox.hpp"
 
+
+
+
 int main(int argc, char *argv[])
 {
+    
     std::string ip;
     Phyphox::IMUData movement{};
     SDL_Event event;
@@ -33,6 +37,7 @@ int main(int argc, char *argv[])
     Phyphox poller(ip);
     std::cout << "Starting poll...\n";
 
+    
     while (game.Get_running())
     { // constantly runs
         while (SDL_PollEvent(&event) != 0)
@@ -88,7 +93,18 @@ int main(int argc, char *argv[])
             std::cout << "X: " << game.Get_player()->getX() << " | Y: " << game.Get_player()->getY() << std::endl;
         }
 
+        //all the updates
         game.Draw();
+        for object in objectList{
+            object.draw();
+            if object.collide(game.Get_player()){
+                X = game.Get_player().getX()
+                Y = game.Get_player().getY()
+                if (X>object.getX()){
+                    game.Get_player().setPosition(object.getX(),Y)
+                }
+            }
+        }
 
         SDL_Delay(1000 / 60); // sets a frame limit of 60fps
 

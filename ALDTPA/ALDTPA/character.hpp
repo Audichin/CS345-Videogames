@@ -114,6 +114,26 @@ public:
     }
 };
 
+class Block :public Sprite{
+    protected:
+    bool moveable;//FUTURE CONTENT:: could be use in combination with collide to move block
+
+
+    public:
+    Block(SDL_Renderer *renderer, int count = 1, const std::string &fname = "image", const std::string &exten = ".bmp",
+                int newX = 0, int newY = 0, bool newMoveable =false)
+            : Sprite(renderer, count, fname, exten, newX, newY){}
+    
+    void setPosition(int newX, int newY)
+    {
+        px = static_cast<float>(newX);
+        py = static_cast<float>(newY);
+        Sprite::setPosition(newX, newY);
+    }
+            
+
+};
+
 class Character : public Sprite
 {
     float px, py, vx, vy, ax, ay;
@@ -174,4 +194,5 @@ class Character : public Sprite
             py += 32.0f;
         moveTo(static_cast<int>(px), static_cast<int>(py));
     }
+    
 };

@@ -198,6 +198,8 @@ public:
 
         player->setPosition(x, y);
     }
+    
+
 
 private:
     int width;
