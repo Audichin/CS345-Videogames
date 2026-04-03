@@ -4,7 +4,7 @@
 
 #include "gamewindow.hpp"
 #include "phyphox.hpp"
-
+#include "TextfileConverter.hpp"
 
 
 
@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     static int frame = 0;
     float previousDirect = 0.0f; 
     bool collide=false;
-    vector<Block> objectList;
+    vector<*Block> objectsList;
 
 
     if (game.boot() == 1)
@@ -41,6 +41,14 @@ int main(int argc, char *argv[])
     Phyphox poller(ip);
     std::cout << "Starting poll...\n";
     
+
+    //can be moved anywhere, should only be ran to change current level
+    //Only run once not in a loop
+    //make sure to clear objectsList before reuse
+    TextToObjects(objectsList, game.Get_renderer() /*,"Filename.txt"*/ );
+
+
+
     while (game.Get_running())
     { // constantly runs
 
@@ -77,7 +85,7 @@ int main(int argc, char *argv[])
         }
 
         //loop for collision and object drawing
-        for object in objectList{
+        for object in objectsList{
             object.draw();
             if object.collide(game.Get_player()){collide = true;}
         }
