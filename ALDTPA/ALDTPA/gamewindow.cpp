@@ -130,6 +130,16 @@ int main(int argc, char *argv[])
         }
 
         game.Draw();
+        for (Block *object : objectsList)
+        {
+            
+            if (object == nullptr)
+            {
+                continue;
+            }
+
+            object->draw(game.Get_renderer());
+        }
 
         SDL_Delay(1000 / 60); // sets a frame limit of 60fps
 
