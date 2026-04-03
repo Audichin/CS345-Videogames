@@ -1,5 +1,6 @@
 #include <iostream>
 #include <SDL.h>
+#include <vector>
 
 #include "gamewindow.hpp"
 #include "phyphox.hpp"
@@ -17,6 +18,9 @@ int main(int argc, char *argv[])
     int clear_counter = 0;
     static int frame = 0;
     float previousDirect = 0.0f; 
+    bool collide=false;
+    vector<Block> objectList;
+
 
     if (game.boot() == 1)
     {
@@ -36,7 +40,6 @@ int main(int argc, char *argv[])
 
     Phyphox poller(ip);
     std::cout << "Starting poll...\n";
-
     
     while (game.Get_running())
     { // constantly runs
@@ -71,7 +74,13 @@ int main(int argc, char *argv[])
             clear_counter = 0;
         }
 
-        if (movement.warn == true)
+        //loop for collision and object drawing
+        for object in objectList{
+            object.draw();
+            if object.collide(game.Get_player()){collide = true;}
+        }
+
+        if (movement.warn == true || collide)
         {
             movement.direct = poller.Get_prevDirect();
             movement.yaw = poller.Get_prevYaw();
@@ -93,18 +102,7 @@ int main(int argc, char *argv[])
             std::cout << "X: " << game.Get_player()->getX() << " | Y: " << game.Get_player()->getY() << std::endl;
         }
 
-        //all the updates
         game.Draw();
-        for object in objectList{
-            object.draw();
-            if object.collide(game.Get_player()){
-                X = game.Get_player().getX()
-                Y = game.Get_player().getY()
-                if (X>object.getX()){
-                    game.Get_player().setPosition(object.getX(),Y)
-                }
-            }
-        }
 
         SDL_Delay(1000 / 60); // sets a frame limit of 60fps
 
