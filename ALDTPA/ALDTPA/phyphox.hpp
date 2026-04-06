@@ -156,16 +156,19 @@ public:
 
     void ClearBuffers()
     {
-        std::string url = BaseURL.substr(0, BaseURL.find("/get")) + "/control?cmd=clear";
+        sendControlCommand("clear");
 
-        curl_easy_reset(curl);
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        // Clearing invalidates the last-request cursors, so restart our local history too.
+        prevDirect = 0.0f;
+        prevYaw = 0.0f;
+        prevPitch = 0.0f;
+        prevRoll = 0.0f;
+        prevAttT = 0.0f;
+        wait = 0;
 
-        std::string response;
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-
-        curl_easy_perform(curl);
+        // Phyphox stops measuring after a clear, so give it a moment and resume automatically.
+        std::this_thread::sleep_for(std::chrono::milliseconds(150));
+        sendControlCommand("start");
     }
 
 private:
@@ -191,6 +194,25 @@ private:
         std::string *str = static_cast<std::string *>(userp);
         str->append(static_cast<char *>(contents), totalSize);
         return totalSize;
+    }
+
+    void sendControlCommand(const std::string &command)
+    {
+        const std::string url = BaseURL.substr(0, BaseURL.find("/get")) + "/control?cmd=" + command;
+
+        curl_easy_reset(curl);
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+
+        std::string response;
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+
+        const CURLcode res = curl_easy_perform(curl);
+        if (res != CURLE_OK)
+        {
+            std::cout << "[WARN]: Failed to send Phyphox control command '" << command
+                      << "': " << curl_easy_strerror(res) << std::endl;
+        }
     }
 
     std::string makeURL()

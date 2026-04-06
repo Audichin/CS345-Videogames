@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
     SDL_Event event;
     Gamewindow game;
     int clear_counter = 0;
-    // static int frame = 0;
     bool collide = false;
     std::vector<Block *> objectsList;
     int previousPlayerX = 0;
@@ -27,26 +26,28 @@ int main(int argc, char *argv[])
     {
         return 1;
     }
+
     // LIST OF THINGS TO ADD HERE FOR FUTURE:
     // 1) Add more error handling
     // 2) Create an easier way to make screen size bigger and scale play to center space (for now)
     // 3) Add better image handling and when collision is made (for simple start to actual game)
-    //  a) find a way to inculde BMP files from different folder so it isn't in main folder
+    //    a) find a way to inculde BMP files from different folder so it isn't in main folder
     // 4) Move IP input to a dedicated pop up before game launches to avoid game
-    //  to not respond on boot if IP has not been entered yet
+    //    to not respond on boot if IP has not been entered yet
 
     std::cout << "[NOTICE]: Please make sure you are connected to the same wifi for your phone and PC" << std::endl;
     std::cout << "Enter Phyphox IP (Ex 192.168.1.152): ";
     std::cin >> ip;
 
     Phyphox poller(ip);
+    // Things to work on here:
+    // 1) Need to check url to see if it is valid before booting the rest of the game
+    // 2) Make it autostart if the phone connection is valid to avoid user hassle 
     std::cout << "Starting poll...\n";
-    
 
     //can be moved anywhere, should only be ran to change current level
     //Only run once not in a loop
-    //make sure to clear objectsList before reuse
-    std::cout << "Before text object" << std::endl;
+    //make sure to clear objects list before reuse
     try
     {
         TextToObjects(objectsList, game.Get_renderer() /*,"Filename.txt"*/);
@@ -56,7 +57,6 @@ int main(int argc, char *argv[])
         std::cerr << "[ERR]: " << ex.what() << std::endl;
         game.Set_running(false);
     }
-    std::cout << "After text object" << std::endl;
 
     if (game.Get_player() != nullptr)
     {
@@ -83,16 +83,11 @@ int main(int argc, char *argv[])
         // 2) Find out how to use phone movement to change position
         // 3) Add a way to change sensitivity
         movement = poller.Phyphox_loop();
-        // if (frame % 3 == 0)
-        // {
-            
-        // }
 
-        // frame++;
-        // clear_counter++;
-
-        if (clear_counter > 600) // about 10 seconds at 60 FPS
+        clear_counter++;
+        if (clear_counter > 150)
         {
+            // std::cout << "[NOTICE]: Resetting local Phyphox polling state..." << std::endl;
             poller.ClearBuffers();
             clear_counter = 0;
         }
