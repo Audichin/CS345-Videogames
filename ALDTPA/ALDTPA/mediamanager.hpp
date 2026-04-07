@@ -50,7 +50,6 @@ public:
         }
 
         SDL_SetColorKey(character, SDL_TRUE, SDL_MapRGB(character->format, 255, 0, 255));
-        SDL_SetColorKey(character, SDL_TRUE, SDL_MapRGB(character->format, 173, 54, 58));
 
         SDL_Texture *charText = SDL_CreateTextureFromSurface(renderer, character);
         SDL_FreeSurface(character);

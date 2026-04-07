@@ -6,11 +6,8 @@
 #include "phyphox.hpp"
 #include "TextfileConverter.hpp"
 
-
-
 int main(int argc, char *argv[])
 {
-    
     std::string ip;
     Phyphox::IMUData movement{};
     SDL_Event event;
@@ -20,7 +17,6 @@ int main(int argc, char *argv[])
     std::vector<Block *> objectsList;
     int previousPlayerX = 0;
     int previousPlayerY = 0;
-
 
     if (game.boot() == 1)
     {
@@ -65,12 +61,12 @@ int main(int argc, char *argv[])
     }
 
     while (game.Get_running())
-    { // constantly runs
+    {
         while (SDL_PollEvent(&event) != 0)
         {
             if (event.type == SDL_QUIT)
             {
-                game.Set_running(false); // when quit event happens, stop the game
+                game.Set_running(false); 
             }
             if (event.type == SDL_KEYDOWN && game.Get_player() != nullptr)
             {
@@ -78,10 +74,6 @@ int main(int argc, char *argv[])
             }
         }
 
-        // LIST OF THINGS TO ADD HERE FOR FUTURE:
-        // 1) If a data point is 0, just assume 0 change
-        // 2) Find out how to use phone movement to change position
-        // 3) Add a way to change sensitivity
         movement = poller.Phyphox_loop();
 
         clear_counter++;
